@@ -39,20 +39,17 @@ Namun, wisatawan sering kali menghadapi kesulitan dalam memilih destinasi wisata
 TripTaktik menggunakan pembelajaran mesin untuk menganalisis preferensi pengguna dan memberikan rekomendasi destinasi wisata yang relevan. Berikut adalah alur kerja dalam pengembangan model:
 
 * **Persiapan Data**:
-
   * Pengambilan dataset (destinasi wisata Yogyakarta)
   * Pre-processing data: Encoding, Tokenisasi teks, TF-IDF, dan StandardScaler
 
 * **Pengembangan Model**:
-
   * Menggunakan arsitektur **Siamese Network** (TensorFlow) untuk memproses dan mengklasifikasikan pasangan destinasi wisata yang mirip atau tidak mirip.
   * **Cosine Similarity** digunakan untuk menghitung jarak antar destinasi.
-  * **Pelatihan Model** dengan label pasangan destinasi yang mirip atau tidak mirip dan optimasi menggunakan binary\_crossentropy.
+  * **Pelatihan Model** dengan label pasangan destinasi yang mirip atau tidak mirip dan optimasi menggunakan binary_crossentropy.
   * **Evaluasi Performansi Model**: Mengukur akurasi dan visualisasi loss vs epoch.
 
 * **Deployment & Inference**:
-
-  * Model disimpan dalam format `.h5` dan digunakan di front-end dengan **TensorFlow\.js**.
+  * Model disimpan dalam format `.h5` dan digunakan di front-end dengan **TensorFlow.js**.
   * Menggunakan input dari pengguna untuk mendapatkan rekomendasi destinasi yang paling mirip.
 
 ### 2. **Alur Front-End dan Back-End**
@@ -60,38 +57,29 @@ TripTaktik menggunakan pembelajaran mesin untuk menganalisis preferensi pengguna
 TripTaktik memiliki sistem front-end dan back-end yang terintegrasi untuk memberikan pengalaman pengguna yang mulus.
 
 * **Front-End**:
-
   * Pengembangan antarmuka menggunakan **HTML**, **CSS**, dan **JavaScript** (SPA - Single Page Application).
-  * Sistem rekomendasi berbasis AI/ML dengan **TensorFlow\.js**.
+  * Sistem rekomendasi berbasis AI/ML dengan **TensorFlow.js**.
   * Mengambil data wisata melalui **Fetch API** dan menampilkan gambar destinasi yang dihosting di **Cloudinary**.
-  * Platform di-deploy menggunakan **Netlify**.
 
 * **Back-End**:
-
   * Pengembangan back-end menggunakan **Node.js** dan **Express.js**.
   * RESTful API untuk mengelola data pengguna, destinasi wisata, dan feedback.
   * Penyimpanan data dilakukan dengan **MongoDB Atlas**.
   * **Cloudinary SDK** digunakan untuk meng-upload gambar destinasi wisata.
-  * Hosting menggunakan **Railway**.
 
 ## Teknologi yang Digunakan
 
 ### **Front-End**:
-
 * **HTML**, **CSS**, **JavaScript**
-* **TensorFlow\.js** (untuk AI/ML)
+* **TensorFlow.js** (untuk AI/ML)
 * **Cloudinary** (untuk manajemen gambar)
-* **Netlify** (untuk hosting)
 
 ### **Back-End**:
-
 * **Node.js**, **Express.js**
 * **MongoDB Atlas** (untuk penyimpanan data)
 * **Cloudinary SDK** (untuk upload gambar)
-* **Railway** (untuk hosting)
 
 ### **Machine Learning**:
-
 * **TensorFlow** (untuk pembelajaran mesin)
 * **Pandas** (untuk manipulasi data)
 * **Colab** (untuk eksperimen dan pelatihan model)
@@ -105,29 +93,37 @@ Kunjungi website demo TripTaktik di:
 
 [Klik di sini untuk melihat video demo penggunaan website](https://bit.ly/WebsiteUsageDemoVideo)
 
-## Instalasi
+## Instalasi dan Menjalankan Lokal
+
+Ikuti langkah-langkah berikut untuk menjalankan proyek ini di komputer Anda:
 
 1. **Clone repositori ini**:
-
    ```bash
-   git clone https://github.com/username/repository.git
+   git clone https://github.com/IbnuAditiyo/TripTaktikDeploy.git
    ```
 
-2. **Install dependencies**:
+2. **Masuk ke folder proyek**:
+   ```bash
+   cd TripTaktikDeploy
+   ```
 
+3. **Install dependencies**:
    ```bash
    npm install
    ```
 
+4. **Konfigurasi Environment (.env): Buat file bernama .env di direktori utama (root), lalu isi dengan konfigurasi berikut (sesuaikan dengan kredensial Anda)**:
+    ```env
+    PORT=8000
+    MONGO_URI=mongodb+srv://<username>:<password>@cluster.mongodb.net/triptaktik
+    CLOUDINARY_CLOUD_NAME=nama_cloud_anda
+    CLOUDINARY_API_KEY=api_key_anda
+    CLOUDINARY_API_SECRET=api_secret_anda
+    ```
 
+5. **Jalankan aplikasi**:
+   ```bash
+   npm run start-dev
+   ```
 
-4. **Jalankan aplikasi**:
-
-
-     ```bash
-     npm run start -dev
-     ```
-
-
-5. Akses aplikasi di **localhost** sesuai port yang telah ditentukan.
-
+6. **Akses Aplikasi: Buka browser dan kunjungi http://localhost:8000**.
