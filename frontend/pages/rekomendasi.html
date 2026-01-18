@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Rekomendasi Wisata - TripTaktik</title>
+  <link rel="stylesheet" href="../styles/recomendasi.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+
+<body>
+
+  <header class="header">
+    <div class="logo">Trip.Taktik</div>
+
+    <div class="header-right">
+      <nav class="main-nav" id="mainNav">
+        <button class="close-btn" id="closeNavBtn" style="display: none;" aria-label="Close menu">&times;</button>
+
+        <ul>
+          <li><a href="../index.html">Home</a></li>
+          <li><a href="./triptips.html">TripTips</a></li>
+          <li><a href="#" class="active">Rekomendasi</a></li>
+          <li><a href="./about.html">About</a></li>
+          <li><a href="./wishlist.html">Wishlist</a></li>
+        </ul>
+
+        <div class="user-actions mobile">
+          <div class="language-selector">
+            <img src="../assets/images/indonesia.png" alt="ID" class="flag-icon">
+            <span>ID</span>
+            <i class="fas fa-chevron-down"></i>
+          </div>
+          <div class="user-profile" title="User profile" onclick="location.href='profile.html'">
+            <i class="fas fa-user-circle fa-lg"></i>
+            <span>Profil</span>
+          </div>
+          <div class="logout">
+            <i class="fas fa-sign-out-alt"></i>
+            <span>Keluar</span>
+          </div>
+        </div>
+      </nav>
+
+      <div class="user-actions desktop">
+        <div class="language-selector">
+          <img src="../assets/images/indonesia.png" alt="ID" class="flag-icon">
+          <span>ID</span>
+          <i class="fas fa-chevron-down"></i>
+        </div>
+        <div class="user-profile" title="User profile" onclick="location.href='profile.html'">
+          <i class="fas fa-user-circle fa-lg"></i>
+        </div>
+        <div class="logout">
+          <i class="fas fa-sign-out-alt"></i>
+        </div>
+      </div>
+
+      <button class="hamburger-menu" id="hamburgerBtn" aria-label="Toggle menu" aria-expanded="false">
+        <span class="line"></span>
+        <span class="line"></span>
+        <span class="line"></span>
+      </button>
+    </div>
+  </header>
+
+  <section class="bg-cover" style="background-image: url(../assets/images/bangunan2.jpg);">
+    <h2>Wisata</h2>
+  </section>
+
+  <main class="container">
+    <section class="filter-bar">
+      <select id="filterType">
+        <option value="">Semua Kategori</option>
+        <option value="Agrowisata">Agrowisata</option>
+        <option value="Alam">Alam</option>
+        <option value="Buatan">Buatan</option>
+        <option value="Budaya Dan Sejarah">Budaya Dan Sejarah</option>
+        <option value="Kuliner">Kuliner</option>
+        <option value="Museum">Museum</option>
+        <option value="Pantai">Pantai</option>
+        <option value="Pendidikan">Pendidikan</option>
+        <option value="Religi">Religi</option>
+        <option value="Seni">Seni</option>
+      </select>
+      <select id="filterRating">
+        <option value="">Semua Rating</option>
+        <option value="4.8">≥ 4.8</option>
+        <option value="4.7">≥ 4.7</option>
+        <option value="4.6">≥ 4.6</option>
+        <option value="4.5">≥ 4.5</option>
+        <option value="4.4">≥ 4.4</option>
+        <option value="4.3">≥ 4.3</option>
+        <option value="4.2">≥ 4.2</option>
+        <option value="4.1">≥ 4.1</option>
+        <option value="4.0">≥ 4.0</option>
+      </select>
+      <button onclick="filterWisata()">Cari</button>
+    </section>
+
+    <section id="recommendationList" class="recommendation-list"></section>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-content">
+      <div class="footer-brand">
+        <h3>Trip.Taktik</h3>
+        <p>Trip.Taktik membantu Anda menemukan, membandingkan, dan merencanakan ribuan destinasi
+          di seluruh Indonesia. Hemat waktu riset Anda dengan rekomendasi tepercaya, semuanya dalam satu tempat.</p>
+      </div>
+      <div class="footer-navigation">
+        <h4>Navigasi</h4>
+        <div class="navigation-links">
+          <ul>
+            <li><a href="../index.html">Home</a></li>
+            <li><a href="./triptips.html">TripTips</a></li>
+            <li><a href="./rekomendasi.html">Rekomendasi</a></li>
+          </ul>
+          <ul>
+            <li><a href="./about.html">About</a></li>
+            <li><a href="./wishlist.html">Wishlist</a></li>
+            <li><a href="./profile.html">Profile</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="footer-social">
+        <h4>Ikuti Kami</h4>
+        <div class="social-icons">
+          <a href="https://www.instagram.com/trip_taktik?igsh=MTN3MTRkdHkzbmtweQ==" title="Instagram"><i
+              class="fab fa-instagram"></i></a>
+          <a href="https://www.facebook.com/profile.php?id=61576912637160" title="Facebook"><i
+              class="fab fa-facebook-f"></i></a>
+          <a href="https://x.com/IBNU_ADITIYO?t=pDD4pkhAWZCaneujqFW-5g&s=09" title="Twitter"><i
+              class="fab fa-twitter"></i></a>
+        </div>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p>&copy; 2025 Trip.Taktik. All Rights Reserved.</p>
+    </div>
+  </footer>
+
+  <script src="../scripts/auth-guard.js"></script>
+  <script src="../scripts/recomendasi.js"></script>
+</body>
+
+</html>

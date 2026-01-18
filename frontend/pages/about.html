@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>About - Trip.Taktik</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
+  <link rel="stylesheet" href="../styles/about.css" />
+</head>
+
+<body>
+
+  <div class="loading" id="loading">
+    <div class="spinner"></div>
+  </div>
+
+  <div class="notification" id="notification"></div>
+
+  <header class="header">
+    <div class="logo">Trip.Taktik</div>
+
+    <div class="header-right">
+
+      <nav class="main-nav" id="mainNav">
+        <ul>
+          <li><a href="../index.html">Home</a></li>
+          <li><a href="triptips.html">TripTips</a></li>
+          <li><a href="rekomendasi.html">Rekomendasi</a></li>
+          <li class="active"><a href="about.html">About</a></li>
+          <li><a href="wishlist.html">Wishlist</a></li>
+        </ul>
+
+        <div class="user-actions mobile">
+          <div class="language-selector">
+            <img src="../assets/images/indonesia.png" alt="ID" class="flag-icon">
+            <span>ID</span>
+            <i class="fas fa-chevron-down"></i>
+          </div>
+          <div class="user-profile" title="User profile" onclick="location.href='profile.html'">
+            <i class="fas fa-user-circle fa-lg"></i>
+            <span>Profil</span>
+          </div>
+          <div class="logout">
+            <i class="fas fa-sign-out-alt"></i>
+            <span>Keluar</span>
+          </div>
+        </div>
+      </nav>
+
+      <div class="user-actions desktop">
+        <div class="language-selector">
+          <img src="../assets/images/indonesia.png" alt="ID" class="flag-icon">
+          <span>ID</span>
+          <i class="fas fa-chevron-down"></i>
+        </div>
+        <a href="profile.html" class="user-profile" title="Profil Pengguna">
+          <i class="fas fa-user-circle fa-lg"></i>
+        </a>
+        <div class="logout">
+          <i class="fas fa-sign-out-alt" title="Logout" style="cursor:pointer;"></i>
+        </div>
+      </div>
+
+      <button class="hamburger-menu" id="hamburgerBtn" aria-label="Toggle menu" aria-expanded="false">
+        <span class="line"></span>
+        <span class="line"></span>
+        <span class="line"></span>
+      </button>
+    </div>
+  </header>
+
+  <section class="hero">
+    <h1>About</h1>
+  </section>
+
+  <main class="main-content">
+
+    <section class="why-choose-us">
+      <h2>Why Choose Us?</h2>
+      <p>Travel better with our travel tricks to find new place</p>
+      <div class="features-grid">
+        <div class="feature-card">
+          <div class="feature-icon">
+            <i class="fas fa-calendar-check"></i>
+          </div>
+          <h3>Easy Planning</h3>
+          <p>Dapatkan rekomendasi destinasi pilihan dan susun rencana perjalanan impian Anda hanya dengan
+            beberapa klik. Dari inspirasi hingga itinerary, semua jadi lebih terarah.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">
+            <i class="fas fa-route"></i>
+          </div>
+          <h3>Easy Traveling</h3>
+          <p>Nikmati perjalanan tanpa hambatan dengan panduan praktis dan tips lokal dari kami.
+            Temukan rute terbaik dan manfaatkan setiap momen liburan Anda secara maksimal.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">
+            <i class="fas fa-map-marked-alt"></i>
+          </div>
+          <h3>Easy Tracking</h3>
+          <p>Simpan destinasi favorit Anda dalam Wishlist dan temukan permata tersembunyi
+            di seluruh Indonesia. Petualangan baru menanti di setiap sudut.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="about-section">
+      <div class="about-content">
+        <h2>About Trip.Taktik</h2>
+        <p>Trip.Taktik lahir dari sebuah keyakinan: merencanakan liburan seharusnya sama menyenangkannya
+          dengan liburan itu sendiri. Seringkali, proses perencanaan yang rumit justru mengurangi
+          antusiasme. Karena itulah, kami hadir untuk mengubahnya.</p>
+        <p>Kami bukan sekadar portal wisata biasa. Kami adalah platform yang menyediakan 'taktik' cerdas
+          untuk setiap perjalanan Anda di Indonesia. Misi kami adalah menyederhanakan setiap langkah,
+          mulai dari memberikan rekomendasi destinasi yang telah dikurasi, tips perjalanan
+          anti-mainstream, hingga menyediakan alat perencanaan yang intuitif. Bersama Trip.Taktik,
+          setiap perjalanan adalah sebuah mahakarya yang terencana dengan baik.</p>
+      </div>
+      <div class="about-image">
+        <img src="../assets/images/heha-sky1.png" alt="About Trip.Taktik" />
+      </div>
+    </section>
+
+    <section class="team-section">
+      <h2>Our Teams</h2>
+      <p>Meet our travel experts</p>
+      <div class="team-grid">
+        <div class="team-card">
+          <img src="../assets/images/fharahbi.png" alt="Muhammad Fharahbi Fachri" class="team-image" />
+          <div class="team-info">
+            <h3>Muhammad Fharahbi Fachri</h3>
+            <p>Machine Learning Engineer</p>
+          </div>
+        </div>
+        <div class="team-card">
+          <img src="../assets/images/faris.jpg" alt="Faris Nur Rizqiawan" class="team-image" />
+          <div class="team-info">
+            <h3>Faris Nur Rizqiawan</h3>
+            <p>Machine Learning Engineer</p>
+          </div>
+        </div>
+        <div class="team-card">
+          <img src="../assets/images/davi.jpg" alt="Davi Sulaiman" class="team-image" />
+          <div class="team-info">
+            <h3>Davi Sulaiman</h3>
+            <p>Machine Learning Engineer</p>
+          </div>
+        </div>
+        <div class="team-card">
+          <img src="../assets/images/fahim.jpg" alt="Fahim Ahmad Saputra" class="team-image" />
+          <div class="team-info">
+            <h3>Fahim Ahmad Saputra</h3>
+            <p>UI/UX Designer & Backend Developer</p>
+          </div>
+        </div>
+        <div class="team-card">
+          <img src="../assets/images/rafi.jpg" alt="Rafi Afrian Al Haritz" class="team-image" />
+          <div class="team-info">
+            <h3>Rafi Afrian Al Haritz</h3>
+            <p>UI/UX Designer & Backend Developer</p>
+          </div>
+        </div>
+        <div class="team-card">
+          <img src="../assets/images/ibnu.jpg" alt="Ibnu Aditiyo" class="team-image" />
+          <div class="team-info">
+            <h3>Ibnu Aditiyo</h3>
+            <p>Frontend Developer</p>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-content">
+      <div class="footer-brand">
+        <h3>Trip.Taktik</h3>
+        <p>Trip.Taktik membantu Anda menemukan, membandingkan, dan merencanakan ribuan destinasi
+          di seluruh Indonesia. Hemat waktu riset Anda dengan rekomendasi tepercaya, semuanya dalam satu tempat.</p>
+      </div>
+
+      <div class="footer-navigation">
+        <h4>Navigasi</h4>
+        <div class="navigation-links">
+          <ul>
+            <li><a href="../index.html">Home</a></li>
+            <li><a href="./triptips.html">TripTips</a></li>
+            <li><a href="./rekomendasi.html">Rekomendasi</a></li>
+          </ul>
+          <ul>
+            <li><a href="./about.html">About</a></li>
+            <li><a href="./wishlist.html">Wishlist</a></li>
+            <li><a href="./profile.html">Profile</a></li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="footer-social">
+        <h4>Ikuti Kami</h4>
+        <div class="social-icons">
+          <a href="https://www.instagram.com/trip_taktik?igsh=MTN3MTRkdHkzbmtweQ==" title="Instagram"><i
+              class="fab fa-instagram"></i></a>
+          <a href="https://www.facebook.com/profile.php?id=61576912637160" title="Facebook"><i
+              class="fab fa-facebook-f"></i></a>
+          <a href="https://x.com/IBNU_ADITIYO?t=pDD4pkhAWZCaneujqFW-5g&s=09" title="Twitter"><i
+              class="fab fa-twitter"></i></a>
+        </div>
+      </div>
+    </div>
+
+    <div class="footer-bottom">
+      <p>&copy; 2025 Trip.Taktik. All Rights Reserved.</p>
+    </div>
+  </footer>
+
+  <script src="../scripts/about.js"></script>
+
+</body>
+
+</html>

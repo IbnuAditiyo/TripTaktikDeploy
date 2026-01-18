@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title id="pageTitle">Detail Wisata - Trip.Taktik</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="../styles/detail-page.css">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css"/>
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.14.0"></script>
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+</head>
+<body>
+    <header class="header">
+      <div class="logo">Trip.Taktik</div>
+      <div class="header-right">
+        <nav class="main-nav" id="mainNav">
+          <ul>
+            <li><a href="../index.html">Home</a></li>
+            <li><a href="triptips.html">TripTips</a></li>
+            <li><a href="rekomendasi.html">Rekomendasi</a></li>
+            <li><a href="about.html">About</a></li>
+            <li><a href="wishlist.html">Wishlist</a></li>
+          </ul>
+          <div class="user-actions mobile">
+            <div class="language-selector">
+              <img src="../assets/images/indonesia.png" alt="ID" class="flag-icon">
+              <span>ID</span>
+              <i class="fas fa-chevron-down"></i>
+            </div>
+            <a href="profile.html" class="user-profile" title="Profil Pengguna">
+              <i class="fas fa-user-circle fa-lg"></i>
+              <span>Profil</span>
+            </a>
+            <div class="logout">
+              <i class="fas fa-sign-out-alt fa-lg"></i>
+              <span>Keluar</span>
+            </div>
+          </div>
+        </nav>
+        <div class="user-actions desktop">
+          <div class="language-selector">
+            <img src="../assets/images/indonesia.png" alt="ID" class="flag-icon">
+            <span>ID</span>
+            <i class="fas fa-chevron-down"></i>
+          </div>
+          <a href="profile.html" class="user-profile" title="Profil Pengguna">
+            <i class="fas fa-user-circle fa-lg"></i>
+          </a>
+          <div class="logout" title="Logout">
+            <i class="fas fa-sign-out-alt fa-lg"></i>
+          </div>
+        </div>
+        <button class="hamburger-menu" id="hamburgerBtn" aria-label="Toggle menu" aria-expanded="false">
+          <span class="line"></span>
+          <span class="line"></span>
+          <span class="line"></span>
+        </button>
+      </div>
+    </header>
+
+    <main class="main-content">
+        <div class="left-column">
+            <section class="hero-section">
+                <img src="../assets/images/placeholder-image.jpg" alt="Nama Wisata" class="hero-image" id="heroImage">
+                <div class="hero-overlay">
+                    <h1 class="destination-title" id="destinationTitle">Nama Wisata</h1>
+                </div>
+            </section>
+
+            <section class="content-section">
+                <div class="destination-header">
+                    <div class="rating-section">
+                        <span class="rating-score" id="ratingScore">-,--</span>
+                        <div class="stars" id="starsContainer">
+                            <i class="far fa-star star"></i>
+                            <i class="far fa-star star"></i>
+                            <i class="far fa-star star"></i>
+                            <i class="far fa-star star"></i>
+                            <i class="far fa-star star"></i>
+                        </div>
+                    </div>
+                    <div class="location">
+                        <i class="fas fa-map-marker-alt"></i>
+                        <span id="destinationLocation">-</span>
+                    </div>
+                </div>
+
+                <div class="info-grid">
+                    <div class="info-item">
+                        <div class="info-icon"><i class="fas fa-clock"></i></div>
+                        <div class="info-content">
+                            <h4>Jam Operasional</h4>
+                            <p id="operatingHours">-</p>
+                        </div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-icon"><i class="fas fa-landmark"></i></div>
+                        <div class="info-content">
+                            <h4>Jenis Tur</h4>
+                            <p id="tourType">-</p>
+                        </div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-icon"><i class="fas fa-tags"></i></div>
+                        <div class="info-content">
+                            <h4>Harga Tiket (Perkiraan)</h4>
+                            <p id="ticketPrice">-</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            <section id="related-recommendations" class="section-recommendation">
+                <h3>Wisata Sejenis Lainnya</h3>
+                <div id="relatedList" class="recommendation-list"></div>
+            </section>
+        </div>
+
+        <aside class="sidebar">
+            <button class="wishlist-btn" id="toggleWishlistBtn">
+                <i class="far fa-bookmark" id="wishlist-icon"></i>
+                <span id="wishlist-text">Simpan ke Wishlist</span>
+            </button>
+
+            <div class="map-container">
+            <div class="map-header">
+                <i class="fas fa-map-marked-alt"></i>
+                Peta Lokasi
+            </div>
+            <div class="map-content">
+            <div id="map"></div> 
+            
+            <a id="openInGoogleMaps" href="#" target="_blank" rel="noopener noreferrer">
+                📍 Buka di Google Maps
+            </a>
+            </div>
+            </div>
+
+
+            <div class="overview-section">
+                <div class="overview-header">
+                    <i class="fas fa-info-circle"></i>
+                    Overview
+                </div>
+                <div class="overview-text" id="overviewText">
+                    Deskripsi singkat mengenai tempat wisata akan ditampilkan di sini.
+                </div>
+            </div>
+        </aside>
+    </main>
+
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="footer-brand">
+                <h3>Trip.Taktik</h3>
+                <p>Trip.Taktik membantu Anda menemukan, membandingkan, dan merencanakan ribuan destinasi
+                    di seluruh Indonesia. Hemat waktu riset Anda dengan rekomendasi tepercaya, semuanya dalam satu tempat.</p>
+            </div>
+
+            <div class="footer-navigation">
+                <h4>Navigasi</h4>
+                <div class="navigation-links">
+                    <ul>
+                        <li><a href="../index.html">Home</a></li>
+                        <li><a href="./triptips.html">TripTips</a></li>
+                        <li><a href="./rekomendasi.html">Rekomendasi</a></li>
+                    </ul>
+                    <ul>
+                        <li><a href="./about.html">About</a></li>
+                        <li><a href="./wishlist.html">Wishlist</a></li>
+                        <li><a href="./profile.html">Profile</a></li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="footer-social">
+                <h4>Ikuti Kami</h4>
+                <div class="social-icons">
+                    <a href="https://www.instagram.com/trip_taktik?igsh=MTN3MTRkdHkzbmtweQ==" title="Instagram"><i class="fab fa-instagram"></i></a>
+                    <a href="https://www.facebook.com/profile.php?id=61576912637160" title="Facebook"><i class="fab fa-facebook-f"></i></a>
+                    <a href="https://x.com/IBNU_ADITIYO?t=pDD4pkhAWZCaneujqFW-5g&s=09" title="Twitter"><i class="fab fa-twitter"></i></a>
+                </div>
+            </div>
+        </div>
+
+        <div class="footer-bottom">
+            <p>© 2025 Trip.Taktik. All Rights Reserved.</p>
+        </div>
+    </footer>
+
+    <div id="notification-container-detail"></div>
+    <script src="../scripts/auth-guard.js"></script>
+    <script src="../scripts/detail-page.js"></script>
+</body>
+</html>

@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Profile - Trip.Taktik</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  <link rel="stylesheet" href="../styles/profile.css">
+</head>
+
+<body>
+  <header class="header">
+    <a href="../index.html" class="logo">Trip.Taktik</a>
+    <div class="header-right">
+      <nav class="main-nav" id="mainNav">
+        <ul>
+          <li><a href="../index.html">Home</a></li>
+          <li><a href="triptips.html">TripTips</a></li>
+          <li><a href="rekomendasi.html">Rekomendasi</a></li>
+          <li><a href="about.html">About</a></li>
+          <li><a href="wishlist.html">Wishlist</a></li>
+        </ul>
+        <div class="user-actions mobile">
+          <div class="language-selector">
+            <img src="../assets/images/indonesia.png" alt="ID" class="flag-icon">
+            <span>ID</span>
+            <i class="fas fa-chevron-down"></i>
+          </div>
+          <a href="profile.html" class="user-profile" title="Profil Pengguna">
+            <i class="fas fa-user-circle fa-lg"></i>
+            <span>Profil</span>
+          </a>
+          <div class="logout">
+            <i class="fas fa-sign-out-alt fa-lg"></i>
+            <span>Keluar</span>
+          </div>
+        </div>
+      </nav>
+      <div class="user-actions desktop">
+        <div class="language-selector">
+          <img src="../assets/images/indonesia.png" alt="ID" class="flag-icon">
+          <span>ID</span>
+          <i class="fas fa-chevron-down"></i>
+        </div>
+        <a href="profile.html" class="icon-btn-header user-profile" title="Profil Pengguna">
+          <i class="fas fa-user-circle fa-lg"></i>
+        </a>
+        <div class="logout" title="Logout">
+          <i class="fas fa-sign-out-alt fa-lg"></i>
+        </div>
+      </div>
+      <button class="hamburger-menu" id="hamburgerBtn" aria-label="Toggle menu" aria-expanded="false">
+        <span class="line"></span>
+        <span class="line"></span>
+        <span class="line"></span>
+      </button>
+    </div>
+  </header>
+
+  <div class="main-container">
+    <aside class="profile-sidebar">
+      <div class="profile-header">
+        <div class="profile-avatar" id="profileAvatarDisplay"></div>
+        <h2 class="profile-name" id="sidebarProfileName">Ibnu</h2>
+        <p class="profile-email" id="sidebarProfileEmail">tripibnu@gmail.com</p>
+      </div>
+      <ul class="profile-menu">
+        <li>
+          <a href="#" class="active" onclick="profileApp.navigateToSection('edit-profile', this)">
+            <span class="menu-icon"><i class="fas fa-user-edit"></i></span>
+            <span>Edit Profile</span>
+          </a>
+        </li>
+        <li>
+          <a href="wishlist.html">
+            <span class="menu-icon"><i class="fas fa-bookmark"></i></span>
+            <span>Wishlist</span>
+          </a>
+        </li>
+      </ul>
+    </aside>
+
+    <main class="edit-profile-container" id="editProfileSection">
+      <h1 class="edit-profile-title">Edit Profile</h1>
+      <form id="profileForm">
+        <div class="form-group full-width profile-avatar-group">
+          <div class="profile-avatar-form" id="profileAvatarFormDisplay"></div>
+          <button type="button" class="btn btn-upload" onclick="profileApp.triggerUploadPhoto()">Ganti Foto</button>
+          <input type="file" id="photoInput" accept="image/*" style="display: none;">
+        </div>
+
+        <div class="form-group full-width">
+          <label class="form-label" for="name">Nama</label>
+          <input type="text" class="form-input" id="name" value="Ibnu" placeholder="Masukkan nama Anda">
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label" for="gender">Jenis Kelamin</label>
+            <select class="form-input" id="gender">
+              <option value="" disabled>Pilih Jenis Kelamin</option>
+              <option value="male" selected>Laki-laki</option>
+              <option value="female">Perempuan</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="birthdate">Tanggal Lahir</label>
+            <input type="date" class="form-input" id="birthdate" placeholder="dd/mm/yyyy">
+          </div>
+        </div>
+
+        <div class="form-group full-width">
+          <label class="form-label" for="email">Email</label>
+          <input type="email" class="form-input" id="email" value="tripibnu@gmail.com"
+            placeholder="Masukkan email Anda">
+        </div>
+
+        <div class="form-buttons">
+          <button type="submit" class="btn btn-primary">Simpan Perubahan</button>
+          <button type="button" class="btn btn-secondary" onclick="profileApp.cancelEdit()">Batal</button>
+        </div>
+      </form>
+    </main>
+  </div>
+
+  <footer class="footer">
+    <div class="footer-content">
+      <div class="footer-brand">
+        <h3>Trip.Taktik</h3>
+        <p>Trip.Taktik membantu Anda menemukan, membandingkan, dan merencanakan ribuan destinasi
+          di seluruh Indonesia. Hemat waktu riset Anda dengan rekomendasi tepercaya, semuanya dalam satu tempat.</p>
+      </div>
+      <div class="footer-navigation">
+        <h4>Navigasi</h4>
+        <div class="navigation-links">
+          <ul>
+            <li><a href="../index.html">Home</a></li>
+            <li><a href="./triptips.html">TripTips</a></li>
+            <li><a href="./rekomendasi.html">Rekomendasi</a></li>
+          </ul>
+          <ul>
+            <li><a href="./about.html">About</a></li>
+            <li><a href="./wishlist.html">Wishlist</a></li>
+            <li><a href="./profile.html">Profile</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="footer-social">
+        <h4>Ikuti Kami</h4>
+        <div class="social-icons">
+          <a href="https://www.instagram.com/trip_taktik?igsh=MTN3MTRkdHkzbmtweQ==" title="Instagram"><i
+              class="fab fa-instagram"></i></a>
+          <a href="https://www.facebook.com/profile.php?id=61576912637160" title="Facebook"><i
+              class="fab fa-facebook-f"></i></a>
+          <a href="https://x.com/IBNU_ADITIYO?t=pDD4pkhAWZCaneujqFW-5g&s=09" title="Twitter"><i
+              class="fab fa-twitter"></i></a>
+        </div>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p>&copy; 2025 Trip.Taktik. All Rights Reserved.</p>
+    </div>
+  </footer>
+
+  <div id="notification-container" style="position: fixed; top: 20px; right: 20px; z-index: 1050;"></div>
+
+  <script src="../scripts/profile.js"></script>
+
+</body>
+
+</html>
