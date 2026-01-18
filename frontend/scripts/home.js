@@ -2,7 +2,7 @@ class HomeSystem {
   constructor() {
     this.currentUser = JSON.parse(localStorage.getItem('tripTaktikCurrentUser')) || null;
     this.authPageUrl = '../pages/auth.html';
-    this.apiUrl = 'https://triptaktikjogja-main-production.up.railway.app/api';
+    this.apiUrl = 'http://localhost:8000/api';
     this.allWisataData = [];
     this.init();
   }

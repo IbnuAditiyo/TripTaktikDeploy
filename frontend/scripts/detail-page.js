@@ -52,7 +52,7 @@ const detailPageApp = (() => {
     elements.heroImage.alt = data.nama || 'Gambar Wisata';
 
     elements.heroImage.onerror = () => {
-      elements.heroImage.src = '../assets/images/jalan7.jpg';
+      elements.heroImage.src = '../assets/images/jalan1.jpg';
     };
 
     elements.destinationTitle.textContent = data.nama || 'Tanpa nama';
@@ -82,7 +82,7 @@ const detailPageApp = (() => {
         mapInstance.invalidateSize();
     }, 100);
 
-    document.getElementById('openInGoogleMaps').href = `https://www.google.com/maps/search/?api=1&query=${lat},${lon}`;
+    document.getElementById('openInGoogleMaps').href = `https://www.google.com/maps?q=${lat},${lon}`;
     elements.operatingHours.textContent = '08.00 - 17.00 WIB';
     elements.tourType.textContent = extractType(data);
     elements.ticketPrice.textContent = formatCurrency(data.htm_weekday || 0);
@@ -221,7 +221,7 @@ const detailPageApp = (() => {
     }
 
     try {
-      const response = await fetch('https://triptaktikjogja-main-production.up.railway.app/api/wishlist', {
+      const response = await fetch('http://localhost:8000/api/wishlist', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -235,6 +235,14 @@ const detailPageApp = (() => {
       const result = await response.json();
       if (response.ok) {
         alert('✅ Berhasil ditambahkan ke wishlist');
+
+        // Ambil wishlist lama dari local storage
+          const currentWishlist = JSON.parse(localStorage.getItem('wishlist') || '[]');
+          if (!currentWishlist.some(item => item.no === wisataData.no)) {
+              currentWishlist.push(wisataData);
+              localStorage.setItem('wishlist', JSON.stringify(currentWishlist));
+          }
+
       } else {
         if (result.error?.includes('duplicate')) {
           alert('⚠ Wisata sudah ada di wishlist');

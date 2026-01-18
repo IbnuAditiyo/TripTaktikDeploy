@@ -1,4 +1,4 @@
-const BASE_URL = 'https://triptaktikjogja-main-production.up.railway.app/api';
+const BASE_URL = 'http://localhost:8000/api';
 
 // 🔐 LOGIN
 export async function login(email, password) {
