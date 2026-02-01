@@ -1,4 +1,7 @@
 const detailPageApp = (() => {
+  // Konfigurasi URL API (Ganti port 8000 sesuai backendmu)
+  const API_BASE_URL = 'http://localhost:8000/api';
+
   const elements = {
     heroImage: document.getElementById('heroImage'),
     destinationTitle: document.getElementById('destinationTitle'),
@@ -17,6 +20,19 @@ const detailPageApp = (() => {
 
   let wisataData = null;
   let mapInstance = null;
+
+  // --- HELPER FUNCTIONS ---
+  
+  // Fungsi Notifikasi Pintar (Cek apakah config.js sudah ada showNotification, kalau tidak pakai alert biasa)
+  function notify(message, type = 'info') {
+    if (typeof showNotification === 'function') {
+      showNotification(message, type);
+    } else {
+      // Fallback ke alert jika belum setup config.js
+      if (type === 'error') console.error(message);
+      alert(message);
+    }
+  }
 
   function formatCurrency(amount) {
     return amount ? `Rp${amount.toLocaleString('id-ID')}` : '-';
@@ -87,24 +103,129 @@ const detailPageApp = (() => {
     elements.tourType.textContent = extractType(data);
     elements.ticketPrice.textContent = formatCurrency(data.htm_weekday || 0);
     elements.overviewText.textContent = data.description_clean || 'Deskripsi tidak tersedia.';
-
+    
+    // Panggil update status tombol (Asynchronous)
     updateWishlistBtn();
   }
 
-  function updateWishlistBtn() {
-    const wishlist = JSON.parse(localStorage.getItem('wishlist') || '[]');
-    const saved = wishlist.some(item => item.no === wisataData.no);
-    if (saved) {
+  // --- LOGIC WISHLIST BARU ---
+
+  // 1. Cek Status Langsung ke Server (Single Source of Truth)
+  async function checkServerWishlistStatus() {
+    const user = JSON.parse(localStorage.getItem('tripTaktikCurrentUser'));
+    if (!user || !user._id || !wisataData) return false;
+
+    try {
+      const response = await fetch(`${API_BASE_URL}/wishlist/${user._id}`);
+      if (!response.ok) return false;
+      
+      const wishlistItems = await response.json();
+      // Pastikan property id wisata sesuai dengan response server (biasanya 'wisata_id')
+      return wishlistItems.some(item => item.wisata_id === wisataData.no);
+    } catch (error) {
+      console.error("Gagal cek status wishlist:", error);
+      return false;
+    }
+  }
+
+  // 2. Update Tampilan Tombol
+  async function updateWishlistBtn() {
+    // Tampilkan state loading sementara (opsional)
+    elements.wishlistText.textContent = 'Memuat...';
+
+    const isSaved = await checkServerWishlistStatus();
+    
+    // Simpan status 'saved' di atribut dataset elemen agar bisa dibaca fungsi toggle
+    elements.wishlistBtn.dataset.saved = isSaved ? 'true' : 'false';
+
+    if (isSaved) {
       elements.wishlistIcon.classList.remove('far');
-      elements.wishlistIcon.classList.add('fas');
+      elements.wishlistIcon.classList.add('fas'); // Love Penuh
       elements.wishlistText.textContent = 'Sudah di Wishlist';
     } else {
       elements.wishlistIcon.classList.remove('fas');
-      elements.wishlistIcon.classList.add('far');
+      elements.wishlistIcon.classList.add('far'); // Love Kosong
       elements.wishlistText.textContent = 'Simpan ke Wishlist';
     }
   }
 
+  // 3. Fungsi Toggle (Simpan/Hapus Pintar)
+  async function toggleWishlist() {
+    if (!wisataData || !wisataData.no) {
+      notify('❌ Data wisata tidak valid', 'error');
+      return;
+    }
+
+    const user = JSON.parse(localStorage.getItem('tripTaktikCurrentUser'));
+    if (!user || !user._id) {
+      notify('❌ Anda harus login untuk menambahkan wishlist', 'warning');
+      return;
+    }
+
+    // Baca status dari atribut yang kita set di updateWishlistBtn
+    const isCurrentlySaved = elements.wishlistBtn.dataset.saved === 'true';
+
+    try {
+      let response;
+      
+      if (isCurrentlySaved) {
+        // --- LOGIKA UNSAVE (DELETE) ---
+        response = await fetch(`${API_BASE_URL}/wishlist/${user._id}/${wisataData.no}`, {
+          method: 'DELETE',
+        });
+      } else {
+        // --- LOGIKA SAVE (POST) ---
+        response = await fetch(`${API_BASE_URL}/wishlist`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            userId: user._id,
+            wisata_id: wisataData.no
+          })
+        });
+      }
+
+      const result = await response.json();
+
+      if (response.ok) {
+        // Sukses
+        const actionMsg = isCurrentlySaved ? 'Dihapus dari wishlist' : 'Disimpan ke wishlist';
+        notify(`✅ Berhasil: ${actionMsg}`, 'success');
+
+        // Update Local Storage (Hanya sebagai cache cadangan)
+        const currentWishlist = JSON.parse(localStorage.getItem('wishlist') || '[]');
+        if (isCurrentlySaved) {
+            const newWishlist = currentWishlist.filter(item => item.no !== wisataData.no);
+            localStorage.setItem('wishlist', JSON.stringify(newWishlist));
+        } else {
+            if (!currentWishlist.some(item => item.no === wisataData.no)) {
+                currentWishlist.push(wisataData);
+                localStorage.setItem('wishlist', JSON.stringify(currentWishlist));
+            }
+        }
+
+        // Refresh tombol untuk memastikan status terbaru
+        await updateWishlistBtn();
+
+      } else {
+        // Handle Error Spesifik
+        if (result.error && result.error.includes('duplicate')) {
+            // Jika server bilang duplikat, berarti sebenarnya sudah tersimpan. Update UI saja.
+            notify('Info: Wisata sudah ada di wishlist', 'info');
+            await updateWishlistBtn();
+        } else {
+            throw new Error(result.message || result.error || 'Gagal memproses request');
+        }
+      }
+
+    } catch (err) {
+      notify('❌ Terjadi kesalahan: ' + err.message, 'error');
+    }
+  }
+
+  // --- ML & RECOMMENDATION LOGIC ---
   async function loadModelAndData() {
     const [model, response] = await Promise.all([
       tf.loadGraphModel('../ml-model/model.json'),
@@ -172,7 +293,7 @@ const detailPageApp = (() => {
       `;
       card.addEventListener('click', () => {
         localStorage.setItem('selectedWisata', JSON.stringify(item));
-        window.location.reload(); // Muat ulang halaman dengan data baru
+        window.location.reload(); 
       });
       container.appendChild(card);
     });
@@ -208,55 +329,6 @@ const detailPageApp = (() => {
     }
   }
 
-  async function toggleWishlist() {
-    if (!wisataData || !wisataData.no) {
-      alert('❌ Data wisata tidak valid');
-      return;
-    }
-
-    const user = JSON.parse(localStorage.getItem('tripTaktikCurrentUser'));
-    if (!user || !user._id) {
-      alert('❌ Anda harus login untuk menambahkan wishlist');
-      return;
-    }
-
-    try {
-      const response = await fetch('http://localhost:8000/api/wishlist', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          userId: user._id,
-          wisata_id: wisataData.no
-        })
-      });
-
-      const result = await response.json();
-      if (response.ok) {
-        alert('✅ Berhasil ditambahkan ke wishlist');
-
-        // Ambil wishlist lama dari local storage
-          const currentWishlist = JSON.parse(localStorage.getItem('wishlist') || '[]');
-          if (!currentWishlist.some(item => item.no === wisataData.no)) {
-              currentWishlist.push(wisataData);
-              localStorage.setItem('wishlist', JSON.stringify(currentWishlist));
-          }
-
-      } else {
-        if (result.error?.includes('duplicate')) {
-          alert('⚠ Wisata sudah ada di wishlist');
-        } else {
-          alert('❌ Gagal menambahkan ke wishlist: ' + (result.message || result.error));
-        }
-      }
-
-      updateWishlistBtn();
-    } catch (err) {
-      alert('❌ Terjadi kesalahan saat mengirim ke server: ' + err.message);
-    }
-  }
-
   function init() {
     const stored = localStorage.getItem('selectedWisata');
     if (!stored) {
@@ -266,9 +338,12 @@ const detailPageApp = (() => {
     }
     wisataData = JSON.parse(stored);
     document.title = `${wisataData.nama || 'Detail Wisata'} - Trip.Taktik`;
+    
     renderData(wisataData);
     showRelatedRecommendations(wisataData.nama);
-    elements.wishlistBtn.addEventListener('click', toggleWishlist);
+    
+    // Pasang listener di sini, bukan di renderData agar tidak duplikat
+    elements.wishlistBtn.onclick = toggleWishlist; 
   }
 
   return {
@@ -278,10 +353,9 @@ const detailPageApp = (() => {
 
 // Listener utama setelah DOM siap
 document.addEventListener('DOMContentLoaded', () => {
-    // Inisialisasi logika utama halaman detail
     detailPageApp.init();
 
-    // --- LOGIKA NAVIGASI BARU DITAMBAHKAN DI SINI ---
+    // --- LOGIKA NAVIGASI ---
     const hamburgerBtn = document.getElementById('hamburgerBtn');
     const mainNav = document.getElementById('mainNav');
 
@@ -295,15 +369,15 @@ document.addEventListener('DOMContentLoaded', () => {
       hamburgerBtn.addEventListener('click', toggleMenu);
     }
 
-    // --- LOGIKA LOGOUT STANDAR ---
+    // --- LOGIKA LOGOUT ---
     const logoutButtons = document.querySelectorAll('.logout');
     if (logoutButtons.length > 0) {
         logoutButtons.forEach(button => {
             button.addEventListener('click', () => {
                 if(confirm('Apakah Anda yakin ingin keluar?')) {
-                    localStorage.removeItem('tripTaktikCurrentUser'); // Hapus data user
+                    localStorage.removeItem('tripTaktikCurrentUser'); 
                     alert('Anda telah berhasil logout.');
-                    window.location.href = 'auth.html'; // Arahkan ke halaman login
+                    window.location.href = 'auth.html'; 
                 }
             });
         });
