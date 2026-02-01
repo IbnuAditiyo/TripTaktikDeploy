@@ -191,17 +191,31 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // --- LOGIKA LOGOUT STANDAR ---
   const logoutButtons = document.querySelectorAll('.logout');
-  if (logoutButtons.length > 0) {
-    logoutButtons.forEach(button => {
-      button.addEventListener('click', () => {
-        const isConfirmed = window.confirm("Apakah Anda yakin ingin logout?");
-        if (isConfirmed) {
-          localStorage.removeItem('tripTaktikCurrentUser');
-          sessionStorage.clear();
-          alert('Anda telah berhasil logout.');
-          window.location.href = '../pages/auth.html';
-        }
-      });
-    });
-  }
+    if (logoutButtons.length > 0) {
+        logoutButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                Swal.fire({
+                    title: 'Keluar?',
+                    text: "Tips perjalanan akan menanti Anda kembali.",
+                    icon: 'question',
+                    showCancelButton: true,
+                    confirmButtonColor: '#475d57',
+                    cancelButtonColor: '#d33',
+                    confirmButtonText: 'Ya, Keluar'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        localStorage.removeItem('tripTaktikCurrentUser');
+                        Swal.fire({
+                            title: 'Sampai Jumpa!',
+                            icon: 'success',
+                            timer: 1500,
+                            showConfirmButton: false
+                        }).then(() => {
+                            window.location.href = '../pages/auth.html';
+                        });
+                    }
+                });
+            });
+        });
+    }
 });

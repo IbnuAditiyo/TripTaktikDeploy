@@ -3,7 +3,7 @@ class HomeSystem {
     this.currentUser = JSON.parse(localStorage.getItem('tripTaktikCurrentUser')) || null;
     this.authPageUrl = '../pages/auth.html';
     // Sebaiknya gunakan CONFIG.BASE_URL jika sudah ada config.js
-    this.apiUrl = 'http://localhost:8000/api'; 
+    this.apiUrl = typeof CONFIG !== 'undefined' ? CONFIG.BASE_URL : 'http://localhost:8000/api'; 
     this.allWisataData = [];
     this.init();
   }
@@ -258,12 +258,31 @@ class HomeSystem {
   }
 
   logout() {
-    if (confirm('Apakah Anda yakin ingin logout?')) {
+  Swal.fire({
+    title: 'Yakin ingin keluar?',
+    text: "Anda harus login lagi untuk mengakses fitur akun.",
+    icon: 'question',
+    showCancelButton: true,
+    confirmButtonColor: '#475d57', // Sesuaikan warna tema kamu
+    cancelButtonColor: '#d33',
+    confirmButtonText: 'Ya, Keluar',
+    cancelButtonText: 'Batal'
+  }).then((result) => {
+    if (result.isConfirmed) {
       localStorage.removeItem('tripTaktikCurrentUser');
-      this.showNotification('Berhasil logout. Sampai jumpa!', 'success');
-      setTimeout(() => this.redirectToAuth(), 1500);
+      
+      // Gunakan notify atau Swal success sebelum redirect
+      Swal.fire({
+        title: 'Berhasil Logout!',
+        icon: 'success',
+        timer: 1500,
+        showConfirmButton: false
+      }).then(() => {
+        this.redirectToAuth();
+      });
     }
-  }
+  });
+}
 
   redirectToAuth() {
     window.location.href = this.authPageUrl;

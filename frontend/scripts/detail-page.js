@@ -1,6 +1,6 @@
 const detailPageApp = (() => {
   // Konfigurasi URL API (Ganti port 8000 sesuai backendmu)
-  const API_BASE_URL = 'http://localhost:8000/api';
+  const API_BASE_URL = typeof CONFIG !== 'undefined' ? CONFIG.BASE_URL : 'http://localhost:8000/api';
 
   const elements = {
     heroImage: document.getElementById('heroImage'),
@@ -192,7 +192,16 @@ const detailPageApp = (() => {
       if (response.ok) {
         // Sukses
         const actionMsg = isCurrentlySaved ? 'Dihapus dari wishlist' : 'Disimpan ke wishlist';
-        notify(`✅ Berhasil: ${actionMsg}`, 'success');
+        Swal.fire({
+            title: 'Berhasil!',
+            text: actionMsg,
+            icon: 'success',
+            timer: 1500, // Hilang otomatis dalam 1.5 detik
+            showConfirmButton: false,
+            // Opsional: atur background agar sesuai tema (jika mau)
+            // background: '#fff', 
+            // color: '#333'
+        });
 
         // Update Local Storage (Hanya sebagai cache cadangan)
         const currentWishlist = JSON.parse(localStorage.getItem('wishlist') || '[]');
@@ -374,11 +383,27 @@ document.addEventListener('DOMContentLoaded', () => {
     if (logoutButtons.length > 0) {
         logoutButtons.forEach(button => {
             button.addEventListener('click', () => {
-                if(confirm('Apakah Anda yakin ingin keluar?')) {
-                    localStorage.removeItem('tripTaktikCurrentUser'); 
-                    alert('Anda telah berhasil logout.');
-                    window.location.href = 'auth.html'; 
-                }
+                Swal.fire({
+                    title: 'Logout?',
+                    text: "Sesi Anda akan berakhir.",
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#475d57',
+                    cancelButtonColor: '#d33',
+                    confirmButtonText: 'Ya, Keluar'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        localStorage.removeItem('tripTaktikCurrentUser');
+                        Swal.fire({
+                            title: 'Sampai Jumpa!',
+                            icon: 'success',
+                            timer: 1500,
+                            showConfirmButton: false
+                        }).then(() => {
+                            window.location.href = 'auth.html';
+                        });
+                    }
+                });
             });
         });
     }

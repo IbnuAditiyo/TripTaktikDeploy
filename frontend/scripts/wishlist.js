@@ -1,5 +1,15 @@
-const BASE_URL = 'http://localhost:8000/api';
+// 1. GUNAKAN CONFIG.BASE_URL
+const BASE_URL = typeof CONFIG !== 'undefined' ? CONFIG.BASE_URL : 'http://localhost:8000/api';
 const wishlistContainer = document.getElementById('wishlistContent');
+
+// Helper Wrapper Notifikasi
+function notify(message, type = 'info') {
+  if (typeof showNotification === 'function') {
+      showNotification(message, type);
+  } else {
+      alert(message); // Fallback
+  }
+}
 
 // Fungsi untuk mendapatkan ID user dari localStorage
 function getUserId() {
@@ -67,7 +77,8 @@ async function loadWishlist() {
     const allWisataData = await datasetResponse.json();
 
     const fullWisataDetails = wishlistItems.map(item => {
-      return allWisataData.find(wisata => wisata.no === item.wisata_id);
+      // Pastikan tipe data sama (kadang string vs number)
+      return allWisataData.find(wisata => wisata.no == item.wisata_id);
     }).filter(item => item !== undefined);
 
     if (fullWisataDetails.length === 0) {
@@ -83,36 +94,64 @@ async function loadWishlist() {
 
 // Fungsi hapus dari wishlist
 async function removeFromWishlist(userId, wisataId) {
-  if (!confirm('Apakah Anda yakin ingin menghapus item ini dari wishlist?')) {
-    return;
-  }
+  // GANTI confirm() dengan Swal.fire()
+  const result = await Swal.fire({
+    title: 'Hapus item?',
+    text: "Wisata ini akan dihapus dari wishlist Anda.",
+    icon: 'warning',
+    showCancelButton: true,
+    confirmButtonColor: '#d33',
+    cancelButtonColor: '#3085d6',
+    confirmButtonText: 'Ya, Hapus!',
+    cancelButtonText: 'Batal'
+  });
+
+  // Jika user klik tombol "Batal", berhenti di sini
+  if (!result.isConfirmed) return;
+
+  // Lanjut proses hapus
   try {
     const response = await fetch(`${BASE_URL}/wishlist/${userId}/${wisataId}`, {
       method: 'DELETE',
     });
-    const result = await response.json();
+    const apiResult = await response.json();
+    
     if (response.ok) {
-      alert(result.message || 'Item berhasil dihapus dari wishlist.');
-      loadWishlist();
+      // Gunakan notifikasi cantik kita (atau Swal success juga boleh)
+      notify(apiResult.message || 'Item berhasil dihapus.', 'success');
+      loadWishlist(); 
     } else {
-      throw new Error(result.message || 'Gagal menghapus item.');
+      throw new Error(apiResult.message || 'Gagal menghapus item.');
     }
   } catch (err) {
-    console.error('Gagal menghapus dari wishlist:', err);
-    alert('Gagal menghapus dari wishlist. Silakan coba lagi.');
+    console.error('Gagal menghapus:', err);
+    notify('Gagal menghapus dari wishlist. Silakan coba lagi.', 'error');
   }
 }
 
 // Fungsi Logout
 function logout() {
-  const userConfirmed = confirm("Apakah Anda yakin ingin logout?");
-  if (userConfirmed) {
-    localStorage.removeItem('tripTaktikCurrentUser');
-    localStorage.removeItem('wishlist');
-    localStorage.removeItem('selectedWisata');
-    alert("Anda telah berhasil logout.");
-    window.location.href = "../index.html";
-  }
+  Swal.fire({
+    title: 'Logout?',
+    text: "Apakah Anda yakin ingin keluar?",
+    icon: 'question',
+    showCancelButton: true,
+    confirmButtonColor: '#475d57', // Sesuaikan warna tema kamu
+    cancelButtonColor: '#d33',
+    confirmButtonText: 'Ya, Keluar',
+    cancelButtonText: 'Batal'
+  }).then((result) => {
+    if (result.isConfirmed) {
+      localStorage.removeItem('tripTaktikCurrentUser');
+      localStorage.removeItem('wishlist');
+      localStorage.removeItem('selectedWisata');
+      
+      notify("Anda telah berhasil logout.", 'success');
+      setTimeout(() => {
+          window.location.href = "../index.html";
+      }, 1000);
+    }
+  });
 }
 
 // --- PENGELOLAAN EVENT LISTENER ---

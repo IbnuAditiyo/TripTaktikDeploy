@@ -77,15 +77,6 @@ class AboutSPA {
     }, { passive: true });
   }
 
-  showWelcomeMessage() {
-    if (this.currentUser && (this.currentUser.username || this.currentUser.email)) {
-      const displayName = this.currentUser.username || this.currentUser.email;
-      setTimeout(() => {
-        this.showNotification(`Selamat datang di Halaman About, ${displayName}!`, 'success');
-      }, 1000);
-    }
-  }
-
   showNotification(message, type = 'info') {
     const notification = document.getElementById('notification');
     if (!notification) return;
@@ -137,23 +128,34 @@ function showUserProfile() {
   }, 300);
 }
 
-function logout() {
-  const confirmed = confirm('Apakah Anda yakin ingin keluar?');
-  if (confirmed) {
-    if (aboutApp) aboutApp.showLoading();
-    localStorage.removeItem('tripTaktikCurrentUser');
-
-    if (aboutApp) {
-      aboutApp.showNotification('Berhasil keluar!', 'success');
-    } else {
-      alert('Berhasil keluar!');
+const logoutButtons = document.querySelectorAll('.logout');
+    if (logoutButtons.length > 0) {
+        logoutButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                Swal.fire({
+                    title: 'Logout',
+                    text: "Terima kasih telah mengenal Trip.Taktik!",
+                    icon: 'question',
+                    showCancelButton: true,
+                    confirmButtonColor: '#475d57',
+                    cancelButtonColor: '#d33',
+                    confirmButtonText: 'Ya, Keluar'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        localStorage.removeItem('tripTaktikCurrentUser');
+                        Swal.fire({
+                            title: 'Sampai Jumpa!',
+                            icon: 'success',
+                            timer: 1500,
+                            showConfirmButton: false
+                        }).then(() => {
+                            window.location.href = 'auth.html';
+                        });
+                    }
+                });
+            });
+        });
     }
-
-    setTimeout(() => {
-      window.location.href = aboutApp ? aboutApp.authPageUrl : '../pages/auth.html';
-    }, 1000);
-  }
-}
 
 
 let aboutApp;

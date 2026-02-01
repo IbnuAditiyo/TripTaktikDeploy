@@ -1,19 +1,35 @@
-import { login, register } from './api.js';
+// Hapus import api.js karena kita akan pakai CONFIG langsung
+// import { login, register } from './api.js'; 
 
 class AuthSystem {
   constructor() {
+    // 1. GUNAKAN CONFIG.BASE_URL
+    // Jika config.js belum termuat, fallback ke localhost
+    this.apiUrl = typeof CONFIG !== 'undefined' ? CONFIG.BASE_URL : 'http://localhost:8000/api';
+    
     this.currentUser = JSON.parse(localStorage.getItem('tripTaktikCurrentUser')) || null;
     this.homePageUrl = '../index.html';
     this.init();
   }
 
   init() {
-    if (this.currentUser) {
+    // Cek apakah user sudah login, jika ya lempar ke home
+    if (this.currentUser && this.currentUser.token) {
       this.redirectToHome();
     } else {
       this.showLogin();
     }
     this.bindEvents();
+  }
+
+  // Helper Wrapper Notifikasi (Sambungkan ke config.js)
+  notify(message, type = 'info') {
+    if (typeof showNotification === 'function') {
+        // Mapping: 'error' tetap 'error', selain itu dianggap 'success'/'info'
+        showNotification(message, type);
+    } else {
+        alert(message); // Fallback jika config.js lupa dipasang
+    }
   }
 
   bindEvents() {
@@ -40,34 +56,54 @@ class AuthSystem {
     const loginBtn = document.getElementById('loginBtn');
 
     if (!email || !password) {
-      this.showAlert('loginAlert', 'Harap isi semua field.', 'error');
+      this.notify('Harap isi semua field.', 'error');
       return;
     }
 
+    // UI Loading State
+    const originalText = loginBtn.textContent;
     loginBtn.classList.add('btn-loading');
     loginBtn.textContent = 'Signing In...';
+    loginBtn.disabled = true;
 
     try {
-      const result = await login(email, password);
-      if (result.token) {
+      // 2. FETCH LANGSUNG MENGGUNAKAN CONFIG
+      const response = await fetch(`${this.apiUrl}/auth/login`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password })
+      });
+
+      const result = await response.json();
+
+      if (response.ok && result.token) {
+        // Sukses Login
         this.currentUser = {
-          _id: result.user.id,
+          _id: result.user.id || result.user._id, // Handle kemungkinan beda nama field
           email: result.user.email,
           name: result.user.name,
           token: result.token,
           loginTime: new Date().toISOString()
         };
+        
         localStorage.setItem('tripTaktikCurrentUser', JSON.stringify(this.currentUser));
-        this.redirectToHome();
+        
+        this.notify('Login berhasil! Mengalihkan...', 'success');
+        setTimeout(() => this.redirectToHome(), 1000);
+
       } else {
-        this.showAlert('loginAlert', result.message || 'Login gagal. Periksa kembali email dan password Anda.', 'error');
+        // Gagal Login
+        this.notify(result.message || 'Email atau password salah.', 'error');
       }
     } catch (error) {
-      this.showAlert('loginAlert', 'Terjadi kesalahan pada server. Coba lagi nanti.', 'error');
+      console.error(error);
+      this.notify('Gagal menghubungi server. Pastikan backend nyala.', 'error');
+    } finally {
+      // Reset UI Button
+      loginBtn.classList.remove('btn-loading');
+      loginBtn.textContent = originalText;
+      loginBtn.disabled = false;
     }
-
-    loginBtn.classList.remove('btn-loading');
-    loginBtn.textContent = 'Log In';
   }
 
   async handleRegister() {
@@ -78,36 +114,48 @@ class AuthSystem {
 
     // Validasi input
     if (!email || !username || !password) {
-      this.showAlert('registerAlert', 'Harap isi semua field.', 'error');
+      this.notify('Harap isi semua field.', 'error');
       return;
     }
     if (!this.isValidEmail(email)) {
-      this.showAlert('registerAlert', 'Format email tidak valid.', 'error');
+      this.notify('Format email tidak valid.', 'error');
       return;
     }
     if (password.length < 6) {
-      this.showAlert('registerAlert', 'Password minimal harus 6 karakter.', 'error');
+      this.notify('Password minimal harus 6 karakter.', 'error');
       return;
     }
 
+    const originalText = registerBtn.textContent;
     registerBtn.classList.add('btn-loading');
     registerBtn.textContent = 'Creating Account...';
+    registerBtn.disabled = true;
 
     try {
-      const result = await register(username, email, password);
-      if (result.user) {
-        this.showAlert('registerSuccess', 'Akun berhasil dibuat! Anda akan dialihkan ke halaman login.', 'success');
+      // 3. FETCH REGISTER PAKAI CONFIG
+      const response = await fetch(`${this.apiUrl}/auth/register`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name: username, email, password })
+      });
+
+      const result = await response.json();
+
+      if (response.ok) {
+        this.notify('Akun berhasil dibuat! Silakan login.', 'success');
         document.getElementById('registerForm').reset();
-        setTimeout(() => this.showLogin(), 2000);
+        setTimeout(() => this.showLogin(), 1500);
       } else {
-        this.showAlert('registerAlert', result.message || 'Registrasi gagal. Coba lagi.', 'error');
+        this.notify(result.message || 'Registrasi gagal.', 'error');
       }
     } catch (error) {
-      this.showAlert('registerAlert', 'Terjadi kesalahan pada server. Coba lagi nanti.', 'error');
+      console.error(error);
+      this.notify('Terjadi kesalahan koneksi.', 'error');
+    } finally {
+      registerBtn.classList.remove('btn-loading');
+      registerBtn.textContent = originalText;
+      registerBtn.disabled = false;
     }
-
-    registerBtn.classList.remove('btn-loading');
-    registerBtn.textContent = 'Register';
   }
 
   redirectToHome() {
@@ -117,7 +165,7 @@ class AuthSystem {
   showLogin() {
     document.getElementById('loginPage').style.display = 'flex';
     document.getElementById('registerPage').style.display = 'none';
-    this.clearAlerts();
+    this.clearAlerts(); // Membersihkan sisa alert lama (opsional)
   }
 
   showRegister() {
@@ -132,20 +180,11 @@ class AuthSystem {
     window.location.href = 'auth.html';
   }
 
-  showAlert(alertId, message, type) {
-    const alertDiv = document.getElementById(alertId);
-    if (alertDiv) {
-      alertDiv.textContent = message;
-      alertDiv.className = `alert alert-${type}`;
-      alertDiv.style.display = 'block';
-      setTimeout(() => alertDiv.style.display = 'none', 5000);
-    }
-  }
-
+  // Fungsi ini dikosongkan/disederhanakan karena kita sudah pakai Notifikasi Toast
+  // Tapi dibiarkan agar tidak error jika ada kode legacy yang memanggilnya
   clearAlerts() {
-    document.querySelectorAll('.alert').forEach(alert => {
-      alert.style.display = 'none';
-    });
+    const alerts = document.querySelectorAll('.alert');
+    if(alerts) alerts.forEach(el => el.style.display = 'none');
   }
 
   isValidEmail(email) {

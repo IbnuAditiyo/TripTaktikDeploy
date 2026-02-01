@@ -2,6 +2,9 @@ const DEFAULT_AVATAR = 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/sv
 
 class ProfilePage {
   constructor() {
+    // Ambil URL dari CONFIG jika ada (untuk deploy nanti)
+    this.apiUrl = typeof CONFIG !== 'undefined' ? CONFIG.BASE_URL : 'http://localhost:8000/api';
+    
     this.currentUser = JSON.parse(localStorage.getItem('tripTaktikCurrentUser'));
     this.authPageUrl = '../pages/auth.html';
     this.homePageUrl = '../index.html';
@@ -17,6 +20,15 @@ class ProfilePage {
     this.init();
   }
 
+  // --- HELPER NOTIFIKASI ---
+  notify(message, type = 'info') {
+    if (typeof showNotification === 'function') {
+        showNotification(message, type);
+    } else {
+        alert(message);
+    }
+  }
+
   init() {
     if (!this.currentUser) {
       this.redirectToAuth();
@@ -25,40 +37,75 @@ class ProfilePage {
     this.loadProfileData();
     this.bindEvents();
     this.updateProfileDisplay();
-    this.navigateToSection('edit-profile', document.querySelector('.profile-menu a.active'));
+
+    // --- LOGIKA TAB DEFAULT (DIPERBAIKI) ---
+    let activeLink = document.querySelector('.profile-menu a.active');
+    
+    // Fallback: Jika HTML tidak punya class active, pilih menu pertama
+    if (!activeLink) {
+        activeLink = document.querySelector('.profile-menu a');
+        if (activeLink) activeLink.classList.add('active');
+    }
+
+    if (activeLink) {
+        const sectionId = activeLink.getAttribute('href').substring(1); 
+        this.navigateToSection(sectionId, activeLink);
+    }
   }
 
   bindEvents() {
-    document.getElementById('profileForm').addEventListener('submit', (e) => {
+    document.getElementById('profileForm')?.addEventListener('submit', (e) => {
       e.preventDefault();
       this.saveProfile();
     });
-    document.getElementById('photoInput').addEventListener('change', (e) => {
+    document.getElementById('photoInput')?.addEventListener('change', (e) => {
       this.handlePhotoUpload(e);
     });
     document.querySelector('.language-selector')?.addEventListener('click', () => {
-      this.showNotification('Pilihan bahasa akan segera hadir!', 'info');
+      this.notify('Pilihan bahasa akan segera hadir!', 'info');
+    });
+    
+    // Tambahkan listener untuk navigasi menu profil
+    document.querySelectorAll('.profile-menu a').forEach(link => {
+        link.addEventListener('click', (e) => {
+            e.preventDefault();
+            const sectionId = link.getAttribute('href').substring(1);
+            this.navigateToSection(sectionId, link);
+        });
     });
   }
 
   loadProfileData() {
-    const storageKey = `tripTaktikUserProfile_${this.currentUser.name || this.currentUser.email}`;
+    const storageKey = `tripTaktikUserProfile_${this.currentUser.email || this.currentUser.name}`;
     const storedData = JSON.parse(localStorage.getItem(storageKey));
+    
+    this.profileData.name = this.currentUser.name || "Pengguna Baru";
+    this.profileData.email = this.currentUser.email || "email@contoh.com";
+    
     if (storedData) {
       this.profileData = { ...this.profileData, ...storedData };
-    } else {
-      this.profileData.name = this.currentUser.name || "Pengguna Baru";
-      this.profileData.email = this.currentUser.email || "email@contoh.com";
     }
-    document.getElementById('name').value = this.profileData.name;
-    document.getElementById('email').value = this.profileData.email;
-    document.getElementById('gender').value = this.profileData.gender;
-    document.getElementById('birthdate').value = this.profileData.birthdate;
+    
+    const nameInput = document.getElementById('name');
+    if(nameInput) nameInput.value = this.profileData.name;
+    
+    const emailInput = document.getElementById('email');
+    if(emailInput) emailInput.value = this.profileData.email;
+    
+    const genderInput = document.getElementById('gender');
+    if(genderInput) genderInput.value = this.profileData.gender;
+    
+    const birthdateInput = document.getElementById('birthdate');
+    if(birthdateInput) birthdateInput.value = this.profileData.birthdate;
   }
 
   updateProfileDisplay() {
-    document.getElementById('sidebarProfileName').textContent = this.profileData.name;
-    document.getElementById('sidebarProfileEmail').textContent = this.profileData.email;
+    const sidebarName = document.getElementById('sidebarProfileName');
+    if(sidebarName) sidebarName.textContent = this.profileData.name;
+    
+    const sidebarEmail = document.getElementById('sidebarProfileEmail');
+    if(sidebarEmail) sidebarEmail.textContent = this.profileData.email;
+    
     const avatarElements = [
       document.getElementById('profileAvatarDisplay'),
       document.getElementById('profileAvatarFormDisplay')
@@ -71,24 +118,30 @@ class ProfilePage {
   }
 
   saveProfile() {
-    this.profileData.name = document.getElementById('name').value;
-    this.profileData.gender = document.getElementById('gender').value;
-    this.profileData.birthdate = document.getElementById('birthdate').value;
-    this.profileData.email = document.getElementById('email').value;
-    if (!this.profileData.name || !this.profileData.email) {
-      this.showNotification('Nama dan Email wajib diisi!', 'error');
+    const nameVal = document.getElementById('name').value;
+    const emailVal = document.getElementById('email').value;
+    
+    if (!nameVal || !emailVal) {
+      this.notify('Nama dan Email wajib diisi!', 'error');
       return;
     }
-    const storageKey = `tripTaktikUserProfile_${this.currentUser.name || this.currentUser.email}`;
+
+    this.profileData.name = nameVal;
+    this.profileData.email = emailVal;
+    this.profileData.gender = document.getElementById('gender').value;
+    this.profileData.birthdate = document.getElementById('birthdate').value;
+
+    const storageKey = `tripTaktikUserProfile_${this.currentUser.email || this.currentUser.name}`;
     localStorage.setItem(storageKey, JSON.stringify(this.profileData));
+    
     this.updateProfileDisplay();
-    this.showNotification('Profil berhasil diperbarui!', 'success');
+    this.notify('Profil berhasil diperbarui!', 'success');
   }
 
   cancelEdit() {
     if (confirm('Apakah Anda yakin ingin membatalkan? Perubahan tidak akan disimpan.')) {
-      this.loadProfileData();
-      this.showNotification('Perubahan dibatalkan.', 'info');
+      this.loadProfileData(); 
+      this.notify('Perubahan dibatalkan.', 'info');
     }
   }
 
@@ -101,9 +154,9 @@ class ProfilePage {
     if (file) {
       const reader = new FileReader();
       reader.onload = (e) => {
-        this.profileData.avatar = e.target.result;
+        this.profileData.avatar = e.target.result; 
         this.updateProfileDisplay();
-        this.showNotification('Foto siap diunggah. Klik "Simpan Perubahan" untuk menyimpan.', 'info');
+        this.notify('Foto siap. Klik "Simpan Perubahan" untuk menyimpan.', 'info');
       };
       reader.readAsDataURL(file);
     }
@@ -113,12 +166,15 @@ class ProfilePage {
     document.querySelectorAll('.profile-content-section, .edit-profile-container').forEach(section => {
       section.style.display = 'none';
     });
-    const targetSection = document.getElementById(sectionId + 'Section');
-    if (targetSection) {
-      targetSection.style.display = 'block';
-    } else if (sectionId === 'edit-profile') {
-      document.querySelector('.edit-profile-container').style.display = 'block';
+    
+    if (sectionId === 'edit-profile') {
+        const container = document.querySelector('.edit-profile-container');
+        if(container) container.style.display = 'block';
+    } else {
+        const targetSection = document.getElementById(sectionId + 'Section');
+        if (targetSection) targetSection.style.display = 'block';
     }
+    
     document.querySelectorAll('.profile-menu a').forEach(item => item.classList.remove('active'));
     if (clickedLink) {
       clickedLink.classList.add('active');
@@ -126,46 +182,47 @@ class ProfilePage {
   }
 
   logout() {
-    if (confirm('Apakah Anda yakin ingin keluar?')) {
-      localStorage.removeItem('tripTaktikCurrentUser');
-      this.showNotification('Berhasil keluar!', 'success');
-      setTimeout(() => this.redirectToAuth(), 1500);
+    // Logout Keren dengan SweetAlert2
+    if (typeof Swal !== 'undefined') {
+        Swal.fire({
+          title: 'Keluar dari Akun?',
+          text: "Perubahan yang belum disimpan akan hilang.",
+          icon: 'question',
+          showCancelButton: true,
+          confirmButtonColor: '#475d57',
+          cancelButtonColor: '#d33',
+          confirmButtonText: 'Ya, Keluar'
+        }).then((result) => {
+          if (result.isConfirmed) {
+            localStorage.removeItem('tripTaktikCurrentUser');
+            Swal.fire({
+              title: 'Berhasil Keluar',
+              icon: 'success',
+              timer: 1500,
+              showConfirmButton: false
+            }).then(() => {
+              this.redirectToAuth();
+            });
+          }
+        });
+    } else {
+        // Fallback jika SweetAlert belum load
+        if (confirm('Apakah Anda yakin ingin keluar?')) {
+            localStorage.removeItem('tripTaktikCurrentUser');
+            this.redirectToAuth();
+        }
     }
   }
 
   redirectToAuth() {
     window.location.href = this.authPageUrl;
   }
-
-  showNotification(message, type = 'info') {
-    const container = document.getElementById('notification-container');
-    if (!container) return;
-    const notification = document.createElement('div');
-    notification.textContent = message;
-    notification.style.cssText = `
-      padding: 12px 20px; margin-bottom: 10px; border-radius: 5px; color: white;
-      opacity: 0; transition: opacity 0.3s ease, transform 0.3s ease;
-      transform: translateX(100%); min-width: 250px; text-align: center;
-    `;
-    if (type === 'success') notification.style.backgroundColor = '#28a745';
-    else if (type === 'error') notification.style.backgroundColor = '#dc3545';
-    else notification.style.backgroundColor = '#17a2b8';
-    container.prepend(notification);
-    setTimeout(() => {
-      notification.style.opacity = '1';
-      notification.style.transform = 'translateX(0)';
-    }, 10);
-    setTimeout(() => {
-      notification.style.opacity = '0';
-      notification.style.transform = 'translateX(100%)';
-      setTimeout(() => notification.remove(), 300);
-    }, 3000);
-  }
 }
 
 let profileApp;
 document.addEventListener('DOMContentLoaded', () => {
   profileApp = new ProfilePage();
+  window.profileApp = profileApp; 
 
   const hamburgerBtn = document.getElementById('hamburgerBtn');
   const mainNav = document.getElementById('mainNav');
@@ -183,9 +240,9 @@ document.addEventListener('DOMContentLoaded', () => {
   const logoutButtons = document.querySelectorAll('.logout');
   if (logoutButtons.length > 0) {
     logoutButtons.forEach(button => {
-      if (profileApp) {
-        button.addEventListener('click', () => profileApp.logout());
-      }
+        button.addEventListener('click', () => {
+            if (profileApp) profileApp.logout();
+        });
     });
   }
 });
