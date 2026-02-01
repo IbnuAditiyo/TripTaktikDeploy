@@ -2,7 +2,8 @@ class HomeSystem {
   constructor() {
     this.currentUser = JSON.parse(localStorage.getItem('tripTaktikCurrentUser')) || null;
     this.authPageUrl = '../pages/auth.html';
-    this.apiUrl = 'http://localhost:8000/api';
+    // Sebaiknya gunakan CONFIG.BASE_URL jika sudah ada config.js
+    this.apiUrl = 'http://localhost:8000/api'; 
     this.allWisataData = [];
     this.init();
   }
@@ -28,10 +29,17 @@ class HomeSystem {
       this.allWisataData = await response.json();
       if (!Array.isArray(this.allWisataData)) throw new Error("Data format invalid");
 
-      const topRated = [...this.allWisataData]
-        .sort((a, b) => b.vote_average - a.vote_average)
-        .slice(0, 3);
-      this.renderWisataForYou(topRated);
+      // Load Default: 3 Random Terbaik
+      // Filter yang rating > 4.5
+      const highRated = this.allWisataData.filter(item => {
+          const rating = parseFloat(item.vote_average || item.rating || 0);
+          return rating >= 4.5;
+      });
+      // Acak Urutannya
+      const shuffled = highRated.sort(() => 0.5 - Math.random());
+      const topThreeRandom = shuffled.slice(0, 3);
+      
+      this.renderWisataForYou(topThreeRandom);
     } catch (err) {
       console.error('Gagal memuat rekomendasi awal:', err);
     }
@@ -39,31 +47,43 @@ class HomeSystem {
 
   setupForYouFilter() {
     const form = document.getElementById('foryou-filter-form');
-    const ratingSlider = document.getElementById('foryou-rating');
-    const ratingNumber = document.getElementById('foryou-rating-number');
-
-    if (!form || !ratingSlider || !ratingNumber) return;
-
-    ratingSlider.addEventListener('input', () => ratingNumber.value = parseFloat(ratingSlider.value).toFixed(1));
-    ratingNumber.addEventListener('input', () => ratingSlider.value = ratingNumber.value);
+    
+    if (!form) return;
 
     form.addEventListener('submit', (e) => {
       e.preventDefault();
-      const type = document.getElementById('foryou-type').value;
-      const rating = parseFloat(ratingSlider.value);
+      const typeSelect = document.getElementById('foryou-type');
+      const selectedType = typeSelect ? typeSelect.value : 'all';
 
-      if (!type) {
-        this.showNotification('Silakan pilih Jenis Wisata terlebih dahulu.', 'warning');
-        return;
+      // Tampilkan Loading (Opsional UI improvement)
+      const container = document.getElementById('foryou-container');
+      if(container) container.innerHTML = '<p style="color:white; text-align:center;">Mencari wisata terbaik...</p>';
+
+      let filtered = this.allWisataData;
+
+      // 1. FILTER BERDASARKAN TIPE
+      if (selectedType !== 'all') {
+         // Mapping dari value HTML ke Key JSON
+         // nature -> type_clean_nature
+         const keyMap = `type_clean_${selectedType}`; 
+         filtered = this.allWisataData.filter(item => item[keyMap] === 1);
       }
 
-      const typeKey = `type_clean_${type}`.replace(/ /g, '_');
-      const filtered = this.allWisataData.filter(item => {
-        return item[typeKey] === 1 && parseFloat(item.vote_average) >= rating;
+      // 2. SORTING BERDASARKAN RATING TERTINGGI (Descending)
+      const sorted = filtered.sort((a, b) => {
+          const ratingA = parseFloat(a.vote_average || 0);
+          const ratingB = parseFloat(b.vote_average || 0);
+          return ratingB - ratingA;
       });
 
-      const sorted = filtered.sort((a, b) => b.vote_average - a.vote_average).slice(0, 3);
-      this.renderWisataForYou(sorted);
+      // 3. AMBIL 3 TERATAS
+      const topThree = sorted.slice(0, 3);
+
+      // 4. RENDER
+      setTimeout(() => {
+          this.renderWisataForYou(topThree);
+      }, 300); // Sedikit delay biar kerasa loadingnya
+
       document.querySelector('.recommendations')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
     });
   }
@@ -97,12 +117,12 @@ class HomeSystem {
                         <span class="vote_average-number">${vote_average}</span>
                         <div class="stars">
                             ${'<i class="fas fa-star"></i>'.repeat(filledStars)}
-                            ${'<i class="far fa-star"></i>'.repeat(emptyStars)}
+                            ${'<i class="far fa-star"></i>'.repeat(emptyStars < 0 ? 0 : emptyStars)}
                         </div>
                     </div>
                     <div class="location">
                         <i class="fas fa-map-marker-alt"></i>
-                        <span>${wisata.type || 'Yogyakarta'}</span>
+                        <span>${this.getTypeName(wisata)}</span>
                     </div>
                     <button class="view-more">View More</button>
                 </div>`;
@@ -110,6 +130,17 @@ class HomeSystem {
     });
 
     this.initializeViewMoreButtons();
+  }
+
+  // Helper untuk menampilkan nama tipe yang bagus di Card
+  getTypeName(wisata) {
+      // Cek kolom sesuai nama di database JSON kamu
+      if(wisata.type_clean_Alam === 1) return 'Wisata Alam';
+      if(wisata.type_clean_Budaya_Dan_Sejarah === 1) return 'Wisata Budaya & Sejarah';
+      if(wisata.type_clean_Buatan === 1) return 'Wisata Buatan';
+      if(wisata.type_clean_Pantai === 1) return 'Wisata Pantai';
+      
+      return 'Yogyakarta'; // Default
   }
 
   initializeFeedbackForm() {
@@ -296,7 +327,7 @@ class HomeSystem {
 document.addEventListener('DOMContentLoaded', () => {
   const homeSystem = new HomeSystem();
 
-  // 1. Logika Header Hilang Saat Scroll (khusus Home)
+  // 1. Logika Header Hilang Saat Scroll
   const header = document.querySelector('.header');
   if (header) {
     let lastScrollTop = 0;
@@ -325,7 +356,7 @@ document.addEventListener('DOMContentLoaded', () => {
     hamburgerBtn.addEventListener('click', toggleMenu);
   }
 
-  // 3. Logika Notifikasi Bahasa (Perbaikan)
+  // 3. Logika Notifikasi Bahasa
   const languageSelectors = document.querySelectorAll('.language-selector');
   languageSelectors.forEach(selector => {
     selector.addEventListener('click', () => {
@@ -335,7 +366,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 
-  // 4. Logika Tombol Logout (Perbaikan)
+  // 4. Logika Tombol Logout
   const logoutButtons = document.querySelectorAll('.logout');
   logoutButtons.forEach(button => {
     button.addEventListener('click', () => {

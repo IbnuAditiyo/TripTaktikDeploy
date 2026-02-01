@@ -22,7 +22,7 @@ ul {
   list-style: none;
 }
 
-/* ===== 2. Header & Navigasi (Standardized Version) ===== */
+/* ===== 2. Header & Navigasi ===== */
 .header {
   display: flex;
   justify-content: space-between;
@@ -161,6 +161,7 @@ ul {
   width: 100%;
 }
 
+/* Updated Form Styling - Compact Version */
 #foryou-filter-form {
   display: flex;
   align-items: center;
@@ -168,10 +169,11 @@ ul {
   border-radius: 50px;
   box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
   padding: 8px;
-  max-width: 800px;
+  max-width: 600px; /* Reduced width since slider is gone */
   width: 100%;
-  align-self: center;
+  align-self: center; /* Center the form horizontally in hero */
   margin-bottom: 20px;
+  justify-content: space-between;
 }
 
 #foryou-filter-form label {
@@ -228,67 +230,6 @@ ul {
   color: #6c757d;
 }
 
-.separator {
-  width: 1px;
-  height: 30px;
-  background-color: #e0e0e0;
-}
-
-.rating-group {
-  flex-shrink: 0;
-  gap: 8px;
-}
-
-.rating-icon {
-  font-size: 20px;
-  color: #f5c518;
-  line-height: 1;
-}
-
-input[type="range"] {
-  appearance: none;
-  width: 120px;
-  height: 4px;
-  background: #e0e0e0;
-  border-radius: 5px;
-  outline: none;
-}
-
-input[type="range"]::-webkit-slider-thumb {
-  appearance: none;
-  width: 16px;
-  height: 16px;
-  background: #475d57;
-  border-radius: 50%;
-  cursor: pointer;
-}
-
-input[type="range"]::-moz-range-thumb {
-  width: 16px;
-  height: 16px;
-  background: #475d57;
-  border-radius: 50%;
-  cursor: pointer;
-  border: none;
-}
-
-#foryou-rating-number {
-  width: 50px;
-  border: 1px solid #ccc;
-  border-radius: 8px;
-  text-align: center;
-  font-size: 15px;
-  padding: 4px;
-  -moz-appearance: textfield;
-  appearance: textfield;
-}
-
-#foryou-rating-number::-webkit-outer-spin-button,
-#foryou-rating-number::-webkit-inner-spin-button {
-  -webkit-appearance: none;
-  margin: 0;
-}
-
 #foryou-filter-form button[type="submit"] {
   display: flex;
   align-items: center;
@@ -303,6 +244,7 @@ input[type="range"]::-moz-range-thumb {
   cursor: pointer;
   transition: background-color 0.3s ease;
   margin-left: 5px;
+  white-space: nowrap;
 }
 
 #foryou-filter-form button[type="submit"]:hover {
@@ -514,7 +456,7 @@ input[type="range"]::-moz-range-thumb {
   background-color: #2e403a;
 }
 
-/* ===== 6. Bagian Testimoni ===== */
+/* ===== 6. Bagian Testimoni (Sama seperti sebelumnya) ===== */
 .testimonials {
   padding: 80px 5%;
   background-color: #f9f9f9;
@@ -812,7 +754,7 @@ input[type="range"]::-moz-range-thumb {
   font-size: 14px;
 }
 
-/* ===== 8. Media Queries untuk Desain Responsif ===== */
+/* ===== 8. Media Queries ===== */
 @media (max-width: 992px) {
   .header-right .main-nav ul,
   .header-right .user-actions.desktop {
@@ -925,10 +867,6 @@ input[type="range"]::-moz-range-thumb {
     border: 1px solid #eee;
     border-radius: 25px;
     background-color: #fff;
-  }
-
-  #foryou-filter-form .separator {
-    display: none;
   }
 
   #foryou-filter-form button[type="submit"] {
