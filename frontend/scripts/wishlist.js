@@ -2,7 +2,7 @@
 const BASE_URL = typeof CONFIG !== 'undefined' ? CONFIG.BASE_URL : 'http://localhost:8000/api';
 const wishlistContainer = document.getElementById('wishlistContent');
 
-// Helper Wrapper Notifikasi
+// Helper Wrapper Notifikasi (Tetap dipertahankan untuk error ringan)
 function notify(message, type = 'info') {
   if (typeof showNotification === 'function') {
       showNotification(message, type);
@@ -77,7 +77,6 @@ async function loadWishlist() {
     const allWisataData = await datasetResponse.json();
 
     const fullWisataDetails = wishlistItems.map(item => {
-      // Pastikan tipe data sama (kadang string vs number)
       return allWisataData.find(wisata => wisata.no == item.wisata_id);
     }).filter(item => item !== undefined);
 
@@ -92,9 +91,8 @@ async function loadWishlist() {
   }
 }
 
-// Fungsi hapus dari wishlist
+// --- PERBAIKAN DI SINI ---
 async function removeFromWishlist(userId, wisataId) {
-  // GANTI confirm() dengan Swal.fire()
   const result = await Swal.fire({
     title: 'Hapus item?',
     text: "Wisata ini akan dihapus dari wishlist Anda.",
@@ -106,10 +104,8 @@ async function removeFromWishlist(userId, wisataId) {
     cancelButtonText: 'Batal'
   });
 
-  // Jika user klik tombol "Batal", berhenti di sini
   if (!result.isConfirmed) return;
 
-  // Lanjut proses hapus
   try {
     const response = await fetch(`${BASE_URL}/wishlist/${userId}/${wisataId}`, {
       method: 'DELETE',
@@ -117,15 +113,21 @@ async function removeFromWishlist(userId, wisataId) {
     const apiResult = await response.json();
     
     if (response.ok) {
-      // Gunakan notifikasi cantik kita (atau Swal success juga boleh)
-      notify(apiResult.message || 'Item berhasil dihapus.', 'success');
+      // GANTI notify() dengan Swal.fire() agar muncul di tengah
+      Swal.fire({
+          title: 'Dihapus!',
+          text: apiResult.message || 'Item berhasil dihapus.',
+          icon: 'success',
+          timer: 1500,
+          showConfirmButton: false
+      });
       loadWishlist(); 
     } else {
       throw new Error(apiResult.message || 'Gagal menghapus item.');
     }
   } catch (err) {
     console.error('Gagal menghapus:', err);
-    notify('Gagal menghapus dari wishlist. Silakan coba lagi.', 'error');
+    Swal.fire('Error', 'Gagal menghapus dari wishlist.', 'error');
   }
 }
 
@@ -136,7 +138,7 @@ function logout() {
     text: "Apakah Anda yakin ingin keluar?",
     icon: 'question',
     showCancelButton: true,
-    confirmButtonColor: '#475d57', // Sesuaikan warna tema kamu
+    confirmButtonColor: '#475d57',
     cancelButtonColor: '#d33',
     confirmButtonText: 'Ya, Keluar',
     cancelButtonText: 'Batal'
@@ -146,10 +148,15 @@ function logout() {
       localStorage.removeItem('wishlist');
       localStorage.removeItem('selectedWisata');
       
-      notify("Anda telah berhasil logout.", 'success');
-      setTimeout(() => {
+      Swal.fire({
+          title: 'Berhasil!',
+          text: 'Anda telah berhasil logout.',
+          icon: 'success',
+          timer: 1500,
+          showConfirmButton: false
+      }).then(() => {
           window.location.href = "../index.html";
-      }, 1000);
+      });
     }
   });
 }
