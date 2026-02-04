@@ -1,10 +1,6 @@
-// Hapus import api.js karena kita akan pakai CONFIG langsung
-// import { login, register } from './api.js'; 
-
 class AuthSystem {
   constructor() {
     // 1. GUNAKAN CONFIG.BASE_URL
-    // Jika config.js belum termuat, fallback ke localhost
     this.apiUrl = typeof CONFIG !== 'undefined' ? CONFIG.BASE_URL : 'http://localhost:8000/api';
     
     this.currentUser = JSON.parse(localStorage.getItem('tripTaktikCurrentUser')) || null;
@@ -20,16 +16,6 @@ class AuthSystem {
       this.showLogin();
     }
     this.bindEvents();
-  }
-
-  // Helper Wrapper Notifikasi (Sambungkan ke config.js)
-  notify(message, type = 'info') {
-    if (typeof showNotification === 'function') {
-        // Mapping: 'error' tetap 'error', selain itu dianggap 'success'/'info'
-        showNotification(message, type);
-    } else {
-        alert(message); // Fallback jika config.js lupa dipasang
-    }
   }
 
   bindEvents() {
@@ -55,8 +41,14 @@ class AuthSystem {
     const password = document.getElementById('loginPassword').value;
     const loginBtn = document.getElementById('loginBtn');
 
+    // Validasi Input Kosong
     if (!email || !password) {
-      this.notify('Harap isi semua field.', 'error');
+      Swal.fire({
+        icon: 'warning',
+        title: 'Oops...',
+        text: 'Harap isi email dan password!',
+        confirmButtonColor: '#475d57'
+      });
       return;
     }
 
@@ -67,7 +59,6 @@ class AuthSystem {
     loginBtn.disabled = true;
 
     try {
-      // 2. FETCH LANGSUNG MENGGUNAKAN CONFIG
       const response = await fetch(`${this.apiUrl}/auth/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -79,7 +70,7 @@ class AuthSystem {
       if (response.ok && result.token) {
         // Sukses Login
         this.currentUser = {
-          _id: result.user.id || result.user._id, // Handle kemungkinan beda nama field
+          _id: result.user.id || result.user._id, 
           email: result.user.email,
           name: result.user.name,
           token: result.token,
@@ -88,16 +79,34 @@ class AuthSystem {
         
         localStorage.setItem('tripTaktikCurrentUser', JSON.stringify(this.currentUser));
         
-        this.notify('Login berhasil! Mengalihkan...', 'success');
-        setTimeout(() => this.redirectToHome(), 1000);
+        // Notifikasi Sukses di Tengah
+        Swal.fire({
+          icon: 'success',
+          title: 'Login Berhasil!',
+          text: 'Mengalihkan ke halaman utama...',
+          timer: 1500,
+          showConfirmButton: false
+        }).then(() => {
+           this.redirectToHome();
+        });
 
       } else {
-        // Gagal Login
-        this.notify(result.message || 'Email atau password salah.', 'error');
+        // Gagal Login (Password/Email Salah)
+        Swal.fire({
+          icon: 'error',
+          title: 'Login Gagal',
+          text: result.message || 'Email atau password salah.',
+          confirmButtonColor: '#d33'
+        });
       }
     } catch (error) {
       console.error(error);
-      this.notify('Gagal menghubungi server. Pastikan backend nyala.', 'error');
+      Swal.fire({
+        icon: 'error',
+        title: 'Terjadi Kesalahan',
+        text: 'Gagal menghubungi server. Pastikan backend menyala.',
+        confirmButtonColor: '#d33'
+      });
     } finally {
       // Reset UI Button
       loginBtn.classList.remove('btn-loading');
@@ -114,15 +123,30 @@ class AuthSystem {
 
     // Validasi input
     if (!email || !username || !password) {
-      this.notify('Harap isi semua field.', 'error');
+      Swal.fire({
+        icon: 'warning',
+        title: 'Data Belum Lengkap',
+        text: 'Harap isi semua kolom pendaftaran.',
+        confirmButtonColor: '#475d57'
+      });
       return;
     }
     if (!this.isValidEmail(email)) {
-      this.notify('Format email tidak valid.', 'error');
+      Swal.fire({
+        icon: 'warning',
+        title: 'Email Tidak Valid',
+        text: 'Mohon masukkan format email yang benar.',
+        confirmButtonColor: '#475d57'
+      });
       return;
     }
     if (password.length < 6) {
-      this.notify('Password minimal harus 6 karakter.', 'error');
+      Swal.fire({
+        icon: 'warning',
+        title: 'Password Lemah',
+        text: 'Password minimal harus 6 karakter.',
+        confirmButtonColor: '#475d57'
+      });
       return;
     }
 
@@ -132,7 +156,6 @@ class AuthSystem {
     registerBtn.disabled = true;
 
     try {
-      // 3. FETCH REGISTER PAKAI CONFIG
       const response = await fetch(`${this.apiUrl}/auth/register`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -142,15 +165,34 @@ class AuthSystem {
       const result = await response.json();
 
       if (response.ok) {
-        this.notify('Akun berhasil dibuat! Silakan login.', 'success');
-        document.getElementById('registerForm').reset();
-        setTimeout(() => this.showLogin(), 1500);
+        // Sukses Register
+        Swal.fire({
+          icon: 'success',
+          title: 'Akun Dibuat!',
+          text: 'Silakan login dengan akun baru Anda.',
+          confirmButtonColor: '#475d57'
+        }).then(() => {
+           document.getElementById('registerForm').reset();
+           this.showLogin();
+        });
+
       } else {
-        this.notify(result.message || 'Registrasi gagal.', 'error');
+        // Gagal Register
+        Swal.fire({
+          icon: 'error',
+          title: 'Registrasi Gagal',
+          text: result.message || 'Terjadi kesalahan saat mendaftar.',
+          confirmButtonColor: '#d33'
+        });
       }
     } catch (error) {
       console.error(error);
-      this.notify('Terjadi kesalahan koneksi.', 'error');
+      Swal.fire({
+        icon: 'error',
+        title: 'Koneksi Bermasalah',
+        text: 'Tidak dapat terhubung ke server.',
+        confirmButtonColor: '#d33'
+      });
     } finally {
       registerBtn.classList.remove('btn-loading');
       registerBtn.textContent = originalText;
@@ -165,7 +207,7 @@ class AuthSystem {
   showLogin() {
     document.getElementById('loginPage').style.display = 'flex';
     document.getElementById('registerPage').style.display = 'none';
-    this.clearAlerts(); // Membersihkan sisa alert lama (opsional)
+    this.clearAlerts(); 
   }
 
   showRegister() {
@@ -180,9 +222,9 @@ class AuthSystem {
     window.location.href = 'auth.html';
   }
 
-  // Fungsi ini dikosongkan/disederhanakan karena kita sudah pakai Notifikasi Toast
-  // Tapi dibiarkan agar tidak error jika ada kode legacy yang memanggilnya
   clearAlerts() {
+    // Fungsi ini dikosongkan karena alert lama sudah diganti SweetAlert
+    // Dibiarkan kosong agar tidak error jika dipanggil
     const alerts = document.querySelectorAll('.alert');
     if(alerts) alerts.forEach(el => el.style.display = 'none');
   }
