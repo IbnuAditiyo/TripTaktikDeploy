@@ -2,7 +2,6 @@ const DEFAULT_AVATAR = 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/sv
 
 class ProfilePage {
   constructor() {
-    // Ambil URL dari CONFIG jika ada (untuk deploy nanti)
     this.apiUrl = typeof CONFIG !== 'undefined' ? CONFIG.BASE_URL : 'http://localhost:8000/api';
     
     this.currentUser = JSON.parse(localStorage.getItem('tripTaktikCurrentUser'));
@@ -20,7 +19,6 @@ class ProfilePage {
     this.init();
   }
 
-  // --- HELPER NOTIFIKASI ---
   notify(message, type = 'info') {
     if (typeof showNotification === 'function') {
         showNotification(message, type);
@@ -38,10 +36,8 @@ class ProfilePage {
     this.bindEvents();
     this.updateProfileDisplay();
 
-    // --- LOGIKA TAB DEFAULT (DIPERBAIKI) ---
     let activeLink = document.querySelector('.profile-menu a.active');
     
-    // Fallback: Jika HTML tidak punya class active, pilih menu pertama
     if (!activeLink) {
         activeLink = document.querySelector('.profile-menu a');
         if (activeLink) activeLink.classList.add('active');
@@ -65,7 +61,6 @@ class ProfilePage {
       this.notify('Pilihan bahasa akan segera hadir!', 'info');
     });
     
-    // Tambahkan listener untuk navigasi menu profil
     document.querySelectorAll('.profile-menu a').forEach(link => {
         link.addEventListener('click', (e) => {
             e.preventDefault();
@@ -182,7 +177,6 @@ class ProfilePage {
   }
 
   logout() {
-    // Logout Keren dengan SweetAlert2
     if (typeof Swal !== 'undefined') {
         Swal.fire({
           title: 'Keluar dari Akun?',
@@ -206,7 +200,6 @@ class ProfilePage {
           }
         });
     } else {
-        // Fallback jika SweetAlert belum load
         if (confirm('Apakah Anda yakin ingin keluar?')) {
             localStorage.removeItem('tripTaktikCurrentUser');
             this.redirectToAuth();

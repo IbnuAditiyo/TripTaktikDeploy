@@ -124,7 +124,6 @@ function renderRecommendations(recos, durasi) {
   }
 }
 
-// Fungsi dijalankan setelah DOM dimuat
 document.addEventListener('DOMContentLoaded', () => {
   loadModelAndData();
 
@@ -175,7 +174,6 @@ document.addEventListener('DOMContentLoaded', () => {
     submitButton.disabled = false;
   });
 
-  // --- LOGIKA NAVIGASI STANDAR ---
   const hamburgerBtn = document.getElementById('hamburgerBtn');
   const mainNav = document.getElementById('mainNav');
 
@@ -189,7 +187,6 @@ document.addEventListener('DOMContentLoaded', () => {
     hamburgerBtn.addEventListener('click', toggleMenu);
   }
 
-  // --- LOGIKA LOGOUT STANDAR ---
   const logoutButtons = document.querySelectorAll('.logout');
     if (logoutButtons.length > 0) {
         logoutButtons.forEach(button => {

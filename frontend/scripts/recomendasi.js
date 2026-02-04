@@ -1,10 +1,8 @@
-// Variabel global untuk menyimpan semua data wisata
 let wisataData = [];
 
 /**
- * Menentukan tipe utama wisata dari sebuah objek data.
- * @param {object} w - Objek data satu tempat wisata.
- * @returns {string} - Nama tipe wisata (misal: "Alam", "Kuliner").
+ * @param {object} w
+ * @returns {string}
  */
 function getType(w) {
   const typeMap = {
@@ -30,8 +28,7 @@ function getType(w) {
 }
 
 /**
- * Merender daftar kartu wisata ke dalam DOM berdasarkan data yang diberikan.
- * @param {Array<object>} data - Array berisi objek-objek data wisata.
+ * @param {Array<object>} data
  */
 function renderWisata(data) {
   const list = document.getElementById('recommendationList');
@@ -72,9 +69,7 @@ function renderWisata(data) {
   });
 }
 
-/**
- * Memfilter data wisata berdasarkan pilihan tipe dan rating dari pengguna.
- */
+
 function filterWisata() {
   const filterType = document.getElementById('filterType').value;
   const filterRating = document.getElementById('filterRating').value;
@@ -94,10 +89,8 @@ function filterWisata() {
 }
 
 
-// MENJALANKAN SEMUA FUNGSI SETELAH HALAMAN HTML SELESAI DIMUAT
 document.addEventListener('DOMContentLoaded', () => {
 
-  // --- LOGIKA UNTUK MEMUAT DATA REKOMENDASI ---
   const list = document.getElementById('recommendationList');
   fetch('../data/dataset_jogja_with_vectors_fixed_v2.json')
     .then(res => res.json())
@@ -112,7 +105,6 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     });
 
-  // --- LOGIKA UNTUK FUNGSI LOGOUT ---
   const logoutButtons = document.querySelectorAll('.logout');
     logoutButtons.forEach(button => {
         button.addEventListener('click', () => {
@@ -140,7 +132,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-  // --- LOGIKA UNTUK NAVIGASI MOBILE (HAMBURGER MENU) ---
   const hamburgerBtn = document.getElementById('hamburgerBtn');
   const mainNav = document.getElementById('mainNav');
 

@@ -2,7 +2,6 @@ class HomeSystem {
   constructor() {
     this.currentUser = JSON.parse(localStorage.getItem('tripTaktikCurrentUser')) || null;
     this.authPageUrl = '../pages/auth.html';
-    // Sebaiknya gunakan CONFIG.BASE_URL jika sudah ada config.js
     this.apiUrl = typeof CONFIG !== 'undefined' ? CONFIG.BASE_URL : 'http://localhost:8000/api'; 
     this.allWisataData = [];
     this.init();
@@ -28,14 +27,10 @@ class HomeSystem {
       const response = await fetch('../data/dataset_jogja_with_vectors_fixed_v2.json');
       this.allWisataData = await response.json();
       if (!Array.isArray(this.allWisataData)) throw new Error("Data format invalid");
-
-      // Load Default: 3 Random Terbaik
-      // Filter yang rating > 4.5
       const highRated = this.allWisataData.filter(item => {
           const rating = parseFloat(item.vote_average || item.rating || 0);
           return rating >= 4.5;
       });
-      // Acak Urutannya
       const shuffled = highRated.sort(() => 0.5 - Math.random());
       const topThreeRandom = shuffled.slice(0, 3);
       
@@ -55,34 +50,27 @@ class HomeSystem {
       const typeSelect = document.getElementById('foryou-type');
       const selectedType = typeSelect ? typeSelect.value : 'all';
 
-      // Tampilkan Loading (Opsional UI improvement)
       const container = document.getElementById('foryou-container');
       if(container) container.innerHTML = '<p style="color:white; text-align:center;">Mencari wisata terbaik...</p>';
 
       let filtered = this.allWisataData;
 
-      // 1. FILTER BERDASARKAN TIPE
       if (selectedType !== 'all') {
-         // Mapping dari value HTML ke Key JSON
-         // nature -> type_clean_nature
          const keyMap = `type_clean_${selectedType}`; 
          filtered = this.allWisataData.filter(item => item[keyMap] === 1);
       }
 
-      // 2. SORTING BERDASARKAN RATING TERTINGGI (Descending)
       const sorted = filtered.sort((a, b) => {
           const ratingA = parseFloat(a.vote_average || 0);
           const ratingB = parseFloat(b.vote_average || 0);
           return ratingB - ratingA;
       });
 
-      // 3. AMBIL 3 TERATAS
       const topThree = sorted.slice(0, 3);
 
-      // 4. RENDER
       setTimeout(() => {
           this.renderWisataForYou(topThree);
-      }, 300); // Sedikit delay biar kerasa loadingnya
+      }, 300);
 
       document.querySelector('.recommendations')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
     });
@@ -132,15 +120,13 @@ class HomeSystem {
     this.initializeViewMoreButtons();
   }
 
-  // Helper untuk menampilkan nama tipe yang bagus di Card
   getTypeName(wisata) {
-      // Cek kolom sesuai nama di database JSON kamu
       if(wisata.type_clean_Alam === 1) return 'Wisata Alam';
       if(wisata.type_clean_Budaya_Dan_Sejarah === 1) return 'Wisata Budaya & Sejarah';
       if(wisata.type_clean_Buatan === 1) return 'Wisata Buatan';
       if(wisata.type_clean_Pantai === 1) return 'Wisata Pantai';
       
-      return 'Yogyakarta'; // Default
+      return 'Yogyakarta';
   }
 
   initializeFeedbackForm() {
@@ -263,7 +249,7 @@ class HomeSystem {
     text: "Anda harus login lagi untuk mengakses fitur akun.",
     icon: 'question',
     showCancelButton: true,
-    confirmButtonColor: '#475d57', // Sesuaikan warna tema kamu
+    confirmButtonColor: '#475d57',
     cancelButtonColor: '#d33',
     confirmButtonText: 'Ya, Keluar',
     cancelButtonText: 'Batal'
@@ -271,7 +257,6 @@ class HomeSystem {
     if (result.isConfirmed) {
       localStorage.removeItem('tripTaktikCurrentUser');
       
-      // Gunakan notify atau Swal success sebelum redirect
       Swal.fire({
         title: 'Berhasil Logout!',
         icon: 'success',
@@ -346,7 +331,6 @@ class HomeSystem {
 document.addEventListener('DOMContentLoaded', () => {
   const homeSystem = new HomeSystem();
 
-  // 1. Logika Header Hilang Saat Scroll
   const header = document.querySelector('.header');
   if (header) {
     let lastScrollTop = 0;
@@ -362,7 +346,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }, { passive: true });
   }
 
-  // 2. Logika Hamburger Menu
   const hamburgerBtn = document.getElementById('hamburgerBtn');
   const mainNav = document.getElementById('mainNav');
   if (hamburgerBtn && mainNav) {
@@ -375,7 +358,6 @@ document.addEventListener('DOMContentLoaded', () => {
     hamburgerBtn.addEventListener('click', toggleMenu);
   }
 
-  // 3. Logika Notifikasi Bahasa
   const languageSelectors = document.querySelectorAll('.language-selector');
   languageSelectors.forEach(selector => {
     selector.addEventListener('click', () => {
@@ -385,7 +367,6 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 
-  // 4. Logika Tombol Logout
   const logoutButtons = document.querySelectorAll('.logout');
   logoutButtons.forEach(button => {
     button.addEventListener('click', () => {

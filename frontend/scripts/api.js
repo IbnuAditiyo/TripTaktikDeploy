@@ -1,6 +1,5 @@
 const BASE_URL = 'http://localhost:8000/api';
 
-// 🔐 LOGIN
 export async function login(email, password) {
   const res = await fetch(`${BASE_URL}/auth/login`, {
     method: 'POST',
@@ -10,7 +9,6 @@ export async function login(email, password) {
   return res.json();
 }
 
-// 📝 REGISTER
 export async function register(name, email, password) {
   const res = await fetch(`${BASE_URL}/auth/register`, {
     method: 'POST',
@@ -20,13 +18,11 @@ export async function register(name, email, password) {
   return res.json();
 }
 
-// 📌 GET DETAIL WISATA
 export async function getWisataById(id) {
   const res = await fetch(`${BASE_URL}/wisata/${id}`);
   return res.json();
 }
 
-// ❤️ ADD WISHLIST
 export async function addWishlist(userId, wisata_id, token) {
   const res = await fetch(`${BASE_URL}/wishlist`, {
     method: 'POST',
@@ -40,7 +36,6 @@ export async function addWishlist(userId, wisata_id, token) {
 }
 
 
-// 📋 GET WISHLIST
 export async function getWishlist(userId, token) {
   const res = await fetch(`${BASE_URL}/wishlist/${userId}`, {
     method: 'GET',
@@ -52,7 +47,6 @@ export async function getWishlist(userId, token) {
 }
 
 
-// 🗑 DELETE WISHLIST
 export async function deleteWishlist(userId, wisataId, token) {
   const res = await fetch(`${BASE_URL}/wishlist/${userId}/${wisataId}`, {
     method: 'DELETE',
@@ -63,7 +57,6 @@ export async function deleteWishlist(userId, wisataId, token) {
   return res.json();
 }
 
-// 👤 GET USER DATA (yang sedang login)
 export async function getUser(token) {
   const res = await fetch(`${BASE_URL}/users`, {
     method: 'GET',
@@ -74,13 +67,12 @@ export async function getUser(token) {
   return res.json();
 }
 
-// ✍️ ADD FEEDBACK / TESTIMONIAL
 export async function addFeedback({ title, description, location, image }) {
   const formData = new FormData();
   formData.append('title', title);
   formData.append('description', description);
   formData.append('location', location);
-  formData.append('image', image); // image bisa base64 string, atau File
+  formData.append('image', image);
 
   const res = await fetch(`${BASE_URL}/feedback`, {
     method: 'POST',
@@ -91,7 +83,6 @@ export async function addFeedback({ title, description, location, image }) {
 }
 
 
-// 📥 GET ALL FEEDBACK
 export async function getAllFeedback() {
   const res = await fetch(`${BASE_URL}/feedback`, {
     method: 'GET'

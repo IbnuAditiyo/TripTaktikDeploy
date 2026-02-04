@@ -1,11 +1,8 @@
 const CONFIG = {
-  // Ganti URL ini di satu tempat saja jika nanti mau deploy
   BASE_URL: 'http://localhost:8000/api', 
 };
 
-// Fungsi Notifikasi Custom (Pengganti alert() yang kasar)
 function showNotification(message, type = 'success') {
-  // Cek apakah container notifikasi sudah ada, jika belum buat baru
   let container = document.getElementById('notification-container');
   if (!container) {
     container = document.createElement('div');
@@ -30,13 +27,11 @@ function showNotification(message, type = 'success') {
 
   container.appendChild(toast);
 
-  // Animasi masuk
   setTimeout(() => {
     toast.style.opacity = '1';
     toast.style.transform = 'translateX(0)';
   }, 10);
 
-  // Hilang otomatis setelah 3 detik
   setTimeout(() => {
     toast.style.opacity = '0';
     toast.style.transform = 'translateX(100%)';

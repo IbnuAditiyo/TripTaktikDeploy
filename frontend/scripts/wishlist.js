@@ -1,29 +1,24 @@
-// 1. GUNAKAN CONFIG.BASE_URL
 const BASE_URL = typeof CONFIG !== 'undefined' ? CONFIG.BASE_URL : 'http://localhost:8000/api';
 const wishlistContainer = document.getElementById('wishlistContent');
 
-// Helper Wrapper Notifikasi (Tetap dipertahankan untuk error ringan)
 function notify(message, type = 'info') {
   if (typeof showNotification === 'function') {
       showNotification(message, type);
   } else {
-      alert(message); // Fallback
+      alert(message);
   }
 }
 
-// Fungsi untuk mendapatkan ID user dari localStorage
 function getUserId() {
   const user = JSON.parse(localStorage.getItem('tripTaktikCurrentUser'));
   return user?._id || null;
 }
 
-// Fungsi untuk menangani klik "View More"
 function handleViewMore(wisata) {
   localStorage.setItem('selectedWisata', JSON.stringify(wisata));
   window.location.href = 'detail-page.html';
 }
 
-// Fungsi untuk membuat kartu HTML
 function createWishlistCard(wisata) {
   let imageUrl;
   if (wisata.image && wisata.image.trim() !== '') {
@@ -49,7 +44,6 @@ function createWishlistCard(wisata) {
   `;
 }
 
-// Fungsi utama untuk memuat wishlist
 async function loadWishlist() {
   const userId = getUserId();
   if (!userId) {
@@ -91,7 +85,6 @@ async function loadWishlist() {
   }
 }
 
-// --- PERBAIKAN DI SINI ---
 async function removeFromWishlist(userId, wisataId) {
   const result = await Swal.fire({
     title: 'Hapus item?',
@@ -113,7 +106,6 @@ async function removeFromWishlist(userId, wisataId) {
     const apiResult = await response.json();
     
     if (response.ok) {
-      // GANTI notify() dengan Swal.fire() agar muncul di tengah
       Swal.fire({
           title: 'Dihapus!',
           text: apiResult.message || 'Item berhasil dihapus.',
@@ -131,7 +123,6 @@ async function removeFromWishlist(userId, wisataId) {
   }
 }
 
-// Fungsi Logout
 function logout() {
   Swal.fire({
     title: 'Logout?',
@@ -161,7 +152,6 @@ function logout() {
   });
 }
 
-// --- PENGELOLAAN EVENT LISTENER ---
 document.addEventListener('DOMContentLoaded', () => {
   loadWishlist();
 

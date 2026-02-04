@@ -1,6 +1,5 @@
 class AuthSystem {
   constructor() {
-    // 1. GUNAKAN CONFIG.BASE_URL
     this.apiUrl = typeof CONFIG !== 'undefined' ? CONFIG.BASE_URL : 'http://localhost:8000/api';
     
     this.currentUser = JSON.parse(localStorage.getItem('tripTaktikCurrentUser')) || null;
@@ -9,7 +8,6 @@ class AuthSystem {
   }
 
   init() {
-    // Cek apakah user sudah login, jika ya lempar ke home
     if (this.currentUser && this.currentUser.token) {
       this.redirectToHome();
     } else {
@@ -41,7 +39,6 @@ class AuthSystem {
     const password = document.getElementById('loginPassword').value;
     const loginBtn = document.getElementById('loginBtn');
 
-    // Validasi Input Kosong
     if (!email || !password) {
       Swal.fire({
         icon: 'warning',
@@ -52,7 +49,6 @@ class AuthSystem {
       return;
     }
 
-    // UI Loading State
     const originalText = loginBtn.textContent;
     loginBtn.classList.add('btn-loading');
     loginBtn.textContent = 'Signing In...';
@@ -68,7 +64,6 @@ class AuthSystem {
       const result = await response.json();
 
       if (response.ok && result.token) {
-        // Sukses Login
         this.currentUser = {
           _id: result.user.id || result.user._id, 
           email: result.user.email,
@@ -79,7 +74,6 @@ class AuthSystem {
         
         localStorage.setItem('tripTaktikCurrentUser', JSON.stringify(this.currentUser));
         
-        // Notifikasi Sukses di Tengah
         Swal.fire({
           icon: 'success',
           title: 'Login Berhasil!',
@@ -91,7 +85,6 @@ class AuthSystem {
         });
 
       } else {
-        // Gagal Login (Password/Email Salah)
         Swal.fire({
           icon: 'error',
           title: 'Login Gagal',
@@ -108,7 +101,6 @@ class AuthSystem {
         confirmButtonColor: '#d33'
       });
     } finally {
-      // Reset UI Button
       loginBtn.classList.remove('btn-loading');
       loginBtn.textContent = originalText;
       loginBtn.disabled = false;
@@ -121,7 +113,6 @@ class AuthSystem {
     const password = document.getElementById('registerPassword').value;
     const registerBtn = document.getElementById('registerBtn');
 
-    // Validasi input
     if (!email || !username || !password) {
       Swal.fire({
         icon: 'warning',
@@ -165,7 +156,6 @@ class AuthSystem {
       const result = await response.json();
 
       if (response.ok) {
-        // Sukses Register
         Swal.fire({
           icon: 'success',
           title: 'Akun Dibuat!',
@@ -177,7 +167,6 @@ class AuthSystem {
         });
 
       } else {
-        // Gagal Register
         Swal.fire({
           icon: 'error',
           title: 'Registrasi Gagal',
@@ -223,8 +212,6 @@ class AuthSystem {
   }
 
   clearAlerts() {
-    // Fungsi ini dikosongkan karena alert lama sudah diganti SweetAlert
-    // Dibiarkan kosong agar tidak error jika dipanggil
     const alerts = document.querySelectorAll('.alert');
     if(alerts) alerts.forEach(el => el.style.display = 'none');
   }
@@ -234,11 +221,9 @@ class AuthSystem {
   }
 }
 
-// Inisialisasi AuthSystem saat dokumen dimuat
 const authSystem = new AuthSystem();
 window.authSystem = authSystem;
 
-// Event listener untuk navigasi antara halaman login dan registrasi
 document.addEventListener('DOMContentLoaded', () => {
   const toRegisterLink = document.getElementById('linkToRegister');
   const toLoginLink = document.getElementById('linkToLogin');

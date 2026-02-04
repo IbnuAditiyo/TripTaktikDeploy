@@ -63,7 +63,7 @@ class AboutSPA {
     if (!header) return;
     window.addEventListener('scroll', () => {
       const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
-      const isMenuOpen = document.querySelector('.main-nav.active'); // Diubah ke selector baru
+      const isMenuOpen = document.querySelector('.main-nav.active');
       if (isMenuOpen) {
         header.style.transform = 'translateY(0)';
         return;

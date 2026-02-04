@@ -1,5 +1,4 @@
 const detailPageApp = (() => {
-  // Konfigurasi URL API (Ganti port 8000 sesuai backendmu)
   const API_BASE_URL = typeof CONFIG !== 'undefined' ? CONFIG.BASE_URL : 'http://localhost:8000/api';
 
   const elements = {
@@ -21,14 +20,11 @@ const detailPageApp = (() => {
   let wisataData = null;
   let mapInstance = null;
 
-  // --- HELPER FUNCTIONS ---
   
-  // Fungsi Notifikasi Pintar (Cek apakah config.js sudah ada showNotification, kalau tidak pakai alert biasa)
   function notify(message, type = 'info') {
     if (typeof showNotification === 'function') {
       showNotification(message, type);
     } else {
-      // Fallback ke alert jika belum setup config.js
       if (type === 'error') console.error(message);
       alert(message);
     }
@@ -104,13 +100,10 @@ const detailPageApp = (() => {
     elements.ticketPrice.textContent = formatCurrency(data.htm_weekday || 0);
     elements.overviewText.textContent = data.description_clean || 'Deskripsi tidak tersedia.';
     
-    // Panggil update status tombol (Asynchronous)
     updateWishlistBtn();
   }
 
-  // --- LOGIC WISHLIST BARU ---
 
-  // 1. Cek Status Langsung ke Server (Single Source of Truth)
   async function checkServerWishlistStatus() {
     const user = JSON.parse(localStorage.getItem('tripTaktikCurrentUser'));
     if (!user || !user._id || !wisataData) return false;
@@ -120,7 +113,6 @@ const detailPageApp = (() => {
       if (!response.ok) return false;
       
       const wishlistItems = await response.json();
-      // Pastikan property id wisata sesuai dengan response server (biasanya 'wisata_id')
       return wishlistItems.some(item => item.wisata_id === wisataData.no);
     } catch (error) {
       console.error("Gagal cek status wishlist:", error);
@@ -128,14 +120,11 @@ const detailPageApp = (() => {
     }
   }
 
-  // 2. Update Tampilan Tombol
   async function updateWishlistBtn() {
-    // Tampilkan state loading sementara (opsional)
     elements.wishlistText.textContent = 'Memuat...';
 
     const isSaved = await checkServerWishlistStatus();
     
-    // Simpan status 'saved' di atribut dataset elemen agar bisa dibaca fungsi toggle
     elements.wishlistBtn.dataset.saved = isSaved ? 'true' : 'false';
 
     if (isSaved) {
@@ -149,7 +138,6 @@ const detailPageApp = (() => {
     }
   }
 
-  // 3. Fungsi Toggle (Simpan/Hapus Pintar)
   async function toggleWishlist() {
     if (!wisataData || !wisataData.no) {
       notify('❌ Data wisata tidak valid', 'error');
@@ -162,19 +150,16 @@ const detailPageApp = (() => {
       return;
     }
 
-    // Baca status dari atribut yang kita set di updateWishlistBtn
     const isCurrentlySaved = elements.wishlistBtn.dataset.saved === 'true';
 
     try {
       let response;
       
       if (isCurrentlySaved) {
-        // --- LOGIKA UNSAVE (DELETE) ---
         response = await fetch(`${API_BASE_URL}/wishlist/${user._id}/${wisataData.no}`, {
           method: 'DELETE',
         });
       } else {
-        // --- LOGIKA SAVE (POST) ---
         response = await fetch(`${API_BASE_URL}/wishlist`, {
           method: 'POST',
           headers: {
@@ -190,20 +175,16 @@ const detailPageApp = (() => {
       const result = await response.json();
 
       if (response.ok) {
-        // Sukses
         const actionMsg = isCurrentlySaved ? 'Dihapus dari wishlist' : 'Disimpan ke wishlist';
         Swal.fire({
             title: 'Berhasil!',
             text: actionMsg,
             icon: 'success',
-            timer: 1500, // Hilang otomatis dalam 1.5 detik
+            timer: 1500,
             showConfirmButton: false,
-            // Opsional: atur background agar sesuai tema (jika mau)
-            // background: '#fff', 
-            // color: '#333'
+        
         });
 
-        // Update Local Storage (Hanya sebagai cache cadangan)
         const currentWishlist = JSON.parse(localStorage.getItem('wishlist') || '[]');
         if (isCurrentlySaved) {
             const newWishlist = currentWishlist.filter(item => item.no !== wisataData.no);
@@ -215,13 +196,10 @@ const detailPageApp = (() => {
             }
         }
 
-        // Refresh tombol untuk memastikan status terbaru
         await updateWishlistBtn();
 
       } else {
-        // Handle Error Spesifik
         if (result.error && result.error.includes('duplicate')) {
-            // Jika server bilang duplikat, berarti sebenarnya sudah tersimpan. Update UI saja.
             notify('Info: Wisata sudah ada di wishlist', 'info');
             await updateWishlistBtn();
         } else {
@@ -234,7 +212,6 @@ const detailPageApp = (() => {
     }
   }
 
-  // --- ML & RECOMMENDATION LOGIC ---
   async function loadModelAndData() {
     const [model, response] = await Promise.all([
       tf.loadGraphModel('../ml-model/model.json'),
@@ -351,7 +328,6 @@ const detailPageApp = (() => {
     renderData(wisataData);
     showRelatedRecommendations(wisataData.nama);
     
-    // Pasang listener di sini, bukan di renderData agar tidak duplikat
     elements.wishlistBtn.onclick = toggleWishlist; 
   }
 
@@ -360,11 +336,9 @@ const detailPageApp = (() => {
   };
 })();
 
-// Listener utama setelah DOM siap
 document.addEventListener('DOMContentLoaded', () => {
     detailPageApp.init();
 
-    // --- LOGIKA NAVIGASI ---
     const hamburgerBtn = document.getElementById('hamburgerBtn');
     const mainNav = document.getElementById('mainNav');
 
@@ -378,7 +352,6 @@ document.addEventListener('DOMContentLoaded', () => {
       hamburgerBtn.addEventListener('click', toggleMenu);
     }
 
-    // --- LOGIKA LOGOUT ---
     const logoutButtons = document.querySelectorAll('.logout');
     if (logoutButtons.length > 0) {
         logoutButtons.forEach(button => {
