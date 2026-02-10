@@ -1,4 +1,4 @@
-const BASE_URL = 'http://localhost:8000/api';
+const BASE_URL = 'triptaktikdeploy-production.up.railway.app/api';
 
 export async function login(email, password) {
   const res = await fetch(`${BASE_URL}/auth/login`, {
