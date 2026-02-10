@@ -1,5 +1,5 @@
 const CONFIG = {
-  BASE_URL: 'triptaktikdeploy-production.up.railway.app/api', 
+  BASE_URL: 'https://triptaktikdeploy-production.up.railway.app/api', 
 };
 
 function showNotification(message, type = 'success') {
